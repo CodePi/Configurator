@@ -1,0 +1,14 @@
+jjj=22  
+k=[1, 2, 3, 4, 5]
+n=test 123 #test comment 1
+s={
+	i=8  #test comment 2
+	j=6  
+	k=5  #test comment 3 
+}
+s.j=123
+t=[{ i=1 j=2 k=3 }
+   { i=4 j=5 k=6 }]
+strList=[str1,str2, str3 more, str4\#escape , str5\,more ]
+u.include=file2.txt
+b=true

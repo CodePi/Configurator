@@ -1,0 +1,13 @@
+Major
+- change retVal to an int and change retVal=true to retVal++
+- doesn't handle emptystring, which toStream will print out
+  make emptystring symbol like: ''
+
+Minor
+- add option for range check
+- add a callback function hook for doing checks or triggers
+- option to prevent printing element that have default value
+- add a way to reference another struct e.g.
+	s1 = { x=1 y=2 z=3 }
+	s2 = s1 { z=5 }
+	s3 = s1 { z=6 }
