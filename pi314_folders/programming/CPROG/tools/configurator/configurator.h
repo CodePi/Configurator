@@ -150,26 +150,26 @@ protected:
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
-	// cfgIsEqualHelper(a, b)
+	// cfgCompareHelper(a, b)
 	// returns 0 if same, >0 if different
 
-	/// cfgIsEqualHelper for Configurator
-	static int cfgIsEqualHelper(const Configurator& a, const Configurator& b);
+	/// cfgCompareHelper for Configurator
+	static int cfgCompareHelper(Configurator& a, Configurator& b);
 
 	template <typename T>
-	static int cfgIsEqualHelper(std::vector<T>& a, std::vector<T>& b){
+	static int cfgCompareHelper(std::vector<T>& a, std::vector<T>& b){
 		int retVal = 0;
 		if(a.size()!=b.size()) return 1;
 		for(size_t i=0;i<a.size();i++){
-			retVal+=cfgIsEqualHelper(a[i],b[i]);
+			retVal+=cfgCompareHelper(a[i],b[i]);
 		}
 		return retVal;
 	}
 	
-	/// cfgIsEqualHelper for any type with defined operator==
+	/// cfgCompareHelper for any type with defined operator==
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,int>::type
-		cfgIsEqualHelper(T& a, T& b){
+		cfgCompareHelper(T& a, T& b){
 			return !(a==b);
 	}
 	
@@ -251,7 +251,7 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::vector<T>& vec
 		if(streamOut->fail()) \
 		throwError("Configurator ("+getStructName()+") error, can't write variable: "+#varName);} \
 	else if(mfType==IS_EQUAL) { \
-		retVal+=cfgIsEqualHelper(this->varName,otherPtr->varName); }	
+		retVal+=cfgCompareHelper(this->varName,otherPtr->varName); }	
 
 // alternative to CFG_ENTRY2 used when default defaultVal is sufficient
 #define CFG_ENTRY1(varName) CFG_ENTRY2(varName, getDefaultVal(varName))
