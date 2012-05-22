@@ -31,13 +31,15 @@ int main(){
 
 		string str = tc.toString();
 		tc2.readString(str);
+		if(tc!=tc2) throw runtime_error("Error: tc!=tc2");
 
 		static const int STRSIZE = 1000;
 		char str2[STRSIZE];
 		int size = tc.writeToString(str2,STRSIZE);
 		tc3.readString(str2, size);
+		if(tc!=tc3) throw runtime_error("Error: tc!=tc3");
 
-	}catch(runtime_error& e){
+	}catch(exception& e){
 		cout<<e.what()<<endl;
 	}
 

@@ -118,7 +118,7 @@ void Configurator::writeToFile(const std::string& filename){
 void Configurator::writeToStream(ostream& os,int indent){
 	// write struct to stream
 	if(indent>0) os<<"{\n"; //print braces on nested structs only
-	multiFunction(WRITE_ALL, NULL, NULL, NULL, &os, indent); 
+	multiFunction(WRITE_ALL, NULL, NULL, NULL, &os, indent, NULL); 
 	if(indent>0) os<<Configurator::indentBy(indent-1)<<"}";
 }
 
@@ -144,6 +144,14 @@ string Configurator::toString(){
 	return str;
 }
 
+bool Configurator::operator==(Configurator& other){
+	return !cfgIsEqualHelper(*this, other);
+}
+
+bool Configurator::operator!=(Configurator& other){
+	return cfgIsEqualHelper(*this, other);
+}
+
 void Configurator::set(const std::string& varName, const std::string& val){
 	// set varname = val
 	stringstream ss(val);
@@ -164,7 +172,7 @@ void Configurator::set(const std::string& varName, std::istream& stream){
 		if(pos!=string::npos) subVar = varName.substr(pos+1); //subsequent vars: e.g. "b.c"
 
 		// set value of variable by parsing stream
-		int rc=multiFunction(SET_STREAM,&baseVar,&subVar,&stream,NULL,0);
+		int rc=multiFunction(SET_STREAM,&baseVar,&subVar,&stream,NULL,0,NULL);
 		if(rc==0) throwError("Configurator ("+getStructName()+") error, key not recognized: "+varName);
 		if(rc>1) throwError("Configurator ("+getStructName()+") error, multiple keys with the same name not allowed: "+varName);
 		if(!stream) throwError("Configurator ("+getStructName()+") error, parse error after: "+varName);
@@ -261,4 +269,10 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::string& str, i
 			else  break;
 		}
 	}
+}
+
+int Configurator::cfgIsEqualHelper(const Configurator& a, const Configurator& b){
+	Configurator& a2 = const_cast<Configurator&>(a);
+	Configurator& b2 = const_cast<Configurator&>(b);
+	return a2.multiFunction(IS_EQUAL, NULL,NULL,NULL,NULL,0,&b2);
 }
