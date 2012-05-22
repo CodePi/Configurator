@@ -145,11 +145,11 @@ string Configurator::toString(){
 }
 
 bool Configurator::operator==(Configurator& other){
-	return !cfgIsEqualHelper(*this, other);
+	return !cfgCompareHelper(*this, other); // cfgCompareHelper return 0 if same
 }
 
 bool Configurator::operator!=(Configurator& other){
-	return cfgIsEqualHelper(*this, other);
+	return cfgCompareHelper(*this, other); // cfgCompareHelper return 0 if same
 }
 
 void Configurator::set(const std::string& varName, const std::string& val){
@@ -271,8 +271,6 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::string& str, i
 	}
 }
 
-int Configurator::cfgIsEqualHelper(const Configurator& a, const Configurator& b){
-	Configurator& a2 = const_cast<Configurator&>(a);
-	Configurator& b2 = const_cast<Configurator&>(b);
-	return a2.multiFunction(IS_EQUAL, NULL,NULL,NULL,NULL,0,&b2);
+int Configurator::cfgCompareHelper(Configurator& a, Configurator& b){
+	return a.multiFunction(IS_EQUAL, NULL,NULL,NULL,NULL,0,&b);
 }
