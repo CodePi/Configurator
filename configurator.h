@@ -54,6 +54,10 @@ public:
 	int  writeToString(char* str, int maxSize); //returns bytes used
 	std::string toString();
 
+	/// equality
+	bool operator==(Configurator& other);
+	bool operator!=(Configurator& other);
+
 	/// set varname = val
 	void set(const std::string& varName, const std::string& val);
 	/// set varname based on contents of stream
@@ -64,13 +68,14 @@ public:
 	virtual ~Configurator(){}   
 
 protected:
-	enum MFType{INIT_ALL,SET_STREAM,WRITE_ALL};
+	enum MFType{INIT_ALL,SET_STREAM,WRITE_ALL,IS_EQUAL};
 
 	/// Helper method that is called by all of the public methods above.
 	///   This method is automatically generated in subclass using macros below
 	///   Returns the number of variables matched
 	virtual int multiFunction(MFType mfType, std::string* str, std::string* subVar,
-		std::istream* streamIn, std::ostream* streamOut, int indent)=0;
+		std::istream* streamIn, std::ostream* streamOut, int indent, 
+		Configurator* other)=0;
 
 	/// return i*2 spaces, for printing
 	static std::string indentBy(int i);
@@ -144,6 +149,30 @@ protected:
 			stream<<val;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////
+	// cfgIsEqualHelper(a, b)
+	// returns 0 if same, >0 if different
+
+	/// cfgIsEqualHelper for Configurator
+	static int cfgIsEqualHelper(const Configurator& a, const Configurator& b);
+
+	template <typename T>
+	static int cfgIsEqualHelper(std::vector<T>& a, std::vector<T>& b){
+		int retVal = 0;
+		if(a.size()!=b.size()) return 1;
+		for(size_t i=0;i<a.size();i++){
+			retVal+=cfgIsEqualHelper(a[i],b[i]);
+		}
+		return retVal;
+	}
+	
+	/// cfgIsEqualHelper for any type with defined operator==
+	template <typename T>
+	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,int>::type
+		cfgIsEqualHelper(T& a, T& b){
+			return !(a==b);
+	}
+	
 	/// Used by TTHelper::is_configurator to identify decendents of Configurator
 	typedef void is_configurator;
 
@@ -203,11 +232,14 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::vector<T>& vec
 
 // automatically generates subclass constructor and begins multiFunction method
 #define CFG_HEADER(structName) \
-	structName() { multiFunction(INIT_ALL,NULL,NULL,NULL,NULL,0); } \
+	structName() { multiFunction(INIT_ALL,NULL,NULL,NULL,NULL,0,NULL); } \
 	std::string getStructName() { return #structName; } \
 	int multiFunction(MFType mfType, std::string* str, std::string* subVar, \
-		std::istream* streamIn, std::ostream* streamOut,int indent){ \
-		int retVal=0; 
+		std::istream* streamIn, std::ostream* streamOut,int indent,Configurator*other){ \
+		int retVal=0; \
+		structName* otherPtr; \
+		if(mfType==IS_EQUAL) {otherPtr = dynamic_cast<structName*>(other); \
+			if(!otherPtr) return 1; /*dynamic cast failed, types different*/ }
 
 // continues multiFunction method, called for each member varible in struct 
 #define CFG_ENTRY2(varName, defaultVal) \
@@ -217,7 +249,9 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::vector<T>& vec
 		writeToStreamHelper(*streamOut,varName,indent); \
 		*streamOut<<std::endl;retVal++; \
 		if(streamOut->fail()) \
-		throwError("Configurator ("+getStructName()+") error, can't write variable: "+#varName); }	
+		throwError("Configurator ("+getStructName()+") error, can't write variable: "+#varName);} \
+	else if(mfType==IS_EQUAL) { \
+		retVal+=cfgIsEqualHelper(this->varName,otherPtr->varName); }	
 
 // alternative to CFG_ENTRY2 used when default defaultVal is sufficient
 #define CFG_ENTRY1(varName) CFG_ENTRY2(varName, getDefaultVal(varName))
@@ -225,7 +259,7 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::vector<T>& vec
 // calls multiFunction method of parent
 // allows for inheritance
 #define CFG_PARENT(parentName) \
-	int rc=parentName::multiFunction(mfType,str,subVar,streamIn,streamOut,indent); \
+	int rc=parentName::multiFunction(mfType,str,subVar,streamIn,streamOut,indent,other); \
 	retVal+=rc;
 	
 
