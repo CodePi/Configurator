@@ -93,7 +93,7 @@ protected:
 
 	/// cfgSetFromStream for strings.  
 	/// by default, operator>> will only read one word at a time
-	/// this one will read an entire line
+	/// this one will read until a delimiter: ,#}]\t\r\n
 	static void cfgSetFromStream(std::istream& ss, std::string& str, const std::string& subVar="");
 
 	/// cfgSetFromStream for Configurator descendants
