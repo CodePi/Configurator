@@ -108,7 +108,7 @@ protected:
 	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar="");
 
 	/// cfgSetFromStream for all other types
-	/// the enable_if is required to prevent it from matching on Configurator descendents
+	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
@@ -126,7 +126,7 @@ protected:
 	// Writes the contents of val to the stream
 	// Three definitions below: Configurator, vector, and other
 
-	/// cfgWriteToStreamHelper for descendents of Configurator
+	/// cfgWriteToStreamHelper for descendants of Configurator
 	static void cfgWriteToStreamHelper(std::ostream& stream, Configurator& cfg, int indent);
 
 	/// cfgWriteToStreamHelper for bool (writes true/false)
@@ -141,7 +141,7 @@ protected:
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent);
 
 	/// cfgWriteToStreamHelper for all other types
-	/// the enable_if is required to prevent it from matching on Configurator descendents
+	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
