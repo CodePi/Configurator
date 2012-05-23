@@ -241,7 +241,7 @@ void Configurator::cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& 
 		if(mfType==CFG_COMPARE) {otherPtr = dynamic_cast<structName*>(other); \
 			if(!otherPtr) return 1; /*dynamic cast failed, types different*/ }
 
-// continues cfgMultiFunction method, called for each member varible in struct 
+// continues cfgMultiFunction method, called for each member variable in struct 
 #define CFG_ENTRY2(varName, defaultVal) \
 	if(mfType==CFG_INIT_ALL) {varName = defaultVal;retVal++;} \
 	else if(mfType==CFG_SET && #varName==*str) { cfgSetFromStream(*streamIn,varName,*subVar);retVal++;}\
