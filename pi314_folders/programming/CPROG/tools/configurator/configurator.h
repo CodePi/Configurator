@@ -68,51 +68,51 @@ public:
 	virtual ~Configurator(){}   
 
 protected:
-	enum MFType{INIT_ALL,SET_STREAM,WRITE_ALL,IS_EQUAL};
+	enum MFType{CFG_INIT_ALL,CFG_SET,CFG_WRITE_ALL,CFG_COMPARE};
 
 	/// Helper method that is called by all of the public methods above.
 	///   This method is automatically generated in subclass using macros below
 	///   Returns the number of variables matched
-	virtual int multiFunction(MFType mfType, std::string* str, std::string* subVar,
+	virtual int cfgMultiFunction(MFType mfType, std::string* str, std::string* subVar,
 		std::istream* streamIn, std::ostream* streamOut, int indent, 
 		Configurator* other)=0;
 
 	/// return i*2 spaces, for printing
-	static std::string indentBy(int i);
+	static std::string cfgIndentBy(int i);
 	/// returns default value of type T
-	template <typename T> static T getDefaultVal(const T&var){ return T();}
+	template <typename T> static T cfgGetDefaultVal(const T&var){ return T();}
 	/// overridable method called on parse error
 	virtual void throwError(std::string error){ throw std::runtime_error(error); }
 
 	//////////////////////////////////////////////////////////////////
-	// setFromStream(stream, val, subVar)
-	// Used internally by multiFunction
+	// cfgSetFromStream(stream, val, subVar)
+	// Used internally by cfgMultiFunction
 	// Sets value of val based on contents of stream
 	// subVar is for '.' separated nested structs, e.g. "a.b=5"
 	// Five definitions below: Configurator, string, vector, bool, and other
 
-	/// setFromStream for strings.  
+	/// cfgSetFromStream for strings.  
 	/// by default, operator>> will only read one word at a time
 	/// this one will read an entire line
-	static void setFromStream(std::istream& ss, std::string& str, const std::string& subVar="");
+	static void cfgSetFromStream(std::istream& ss, std::string& str, const std::string& subVar="");
 
-	/// setFromStream for Configurator descendants
-	static void setFromStream(std::istream& ss, Configurator& cfg, const std::string& subVar="");
+	/// cfgSetFromStream for Configurator descendants
+	static void cfgSetFromStream(std::istream& ss, Configurator& cfg, const std::string& subVar="");
 
-	/// setFromStream for bool (allows (t,true,1,f,false,0))
-	static void setFromStream(std::istream& ss, bool& b, const std::string& subVar="");
+	/// cfgSetFromStream for bool (allows (t,true,1,f,false,0))
+	static void cfgSetFromStream(std::istream& ss, bool& b, const std::string& subVar="");
 
 	/// setFromString for vectors
 	/// Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
-	static void setFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar="");
+	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar="");
 
-	/// setFromStream for all other types
+	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendents
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
-		setFromStream(std::istream& ss, T& val, const std::string& subVar=""){
+		cfgSetFromStream(std::istream& ss, T& val, const std::string& subVar=""){
 			if(!subVar.empty()) { //subVar should be empty
 				ss.setstate(std::ios::failbit); //set fail bit to trigger error handling
 				return;
@@ -121,31 +121,31 @@ protected:
 	}
 
 	//////////////////////////////////////////////////////////////////
-	// writeToStreamHelper(stream, val, indent)
-	// Used internally by multiFunction
+	// cfgWriteToStreamHelper(stream, val, indent)
+	// Used internally by cfgMultiFunction
 	// Writes the contents of val to the stream
 	// Three definitions below: Configurator, vector, and other
 
-	/// writeToStreamHelper for descendents of Configurator
-	static void writeToStreamHelper(std::ostream& stream, Configurator& cfg, int indent);
+	/// cfgWriteToStreamHelper for descendents of Configurator
+	static void cfgWriteToStreamHelper(std::ostream& stream, Configurator& cfg, int indent);
 
-	/// writeToStreamHelper for bool (writes true/false)
-	static void writeToStreamHelper(std::ostream& stream, bool& b, int indent);
+	/// cfgWriteToStreamHelper for bool (writes true/false)
+	static void cfgWriteToStreamHelper(std::ostream& stream, bool& b, int indent);
 
-	/// writeToStreamHelper for string (writes true/false)
-	static void writeToStreamHelper(std::ostream& stream, std::string& str, int indent);
+	/// cfgWriteToStreamHelper for string (writes true/false)
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent);
 
-	/// writeToStreamHelper for vectors
+	/// cfgWriteToStreamHelper for vectors
 	/// Prints vector to stream in format: "[1,2,3,4,5]"
 	template <typename T>
-	static void writeToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent);
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent);
 
-	/// writeToStreamHelper for all other types
+	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendents
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
-		writeToStreamHelper(std::ostream& stream, T& val, int indent){
+		cfgWriteToStreamHelper(std::ostream& stream, T& val, int indent){
 			stream<<val;
 	}
 
@@ -184,7 +184,7 @@ protected:
 // setFromString for vectors
 // Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 template <typename T>
-void Configurator::setFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar){
+void Configurator::cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar){
 	if(!subVar.empty()) { //subVar should be empty
 		is.setstate(std::ios::failbit); //set fail bit to trigger error handling
 		return;
@@ -202,7 +202,7 @@ void Configurator::setFromStream(std::istream& is, std::vector<T>& vec, const st
 
 		// read element and add to vector
 		T val;
-		setFromStream(is,val);
+		cfgSetFromStream(is,val);
 		if(is) vec.push_back(val);
 
 		// push to next element, removing comments
@@ -214,54 +214,54 @@ void Configurator::setFromStream(std::istream& is, std::vector<T>& vec, const st
 	}
 }
 
-// writeToStreamHelper for vectors
+// cfgWriteToStreamHelper for vectors
 // Prints vector to stream in format: "[1,2,3,4,5]"
 template <typename T>
-void Configurator::writeToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent){
+void Configurator::cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent){
 	stream<<"[";
 	for(size_t i=0;i<vec.size();i++){
 		if(i>0) stream<<",";
-		writeToStreamHelper(stream,vec[i],indent);
+		cfgWriteToStreamHelper(stream,vec[i],indent);
 	}
 	stream<<"]";
 }
 
 //////////////////////////////////////////////////////////////////
-// Macros to automatically generate the multiFunction method in
+// Macros to automatically generate the cfgMultiFunction method in
 // descendant classes.
 
-// automatically generates subclass constructor and begins multiFunction method
+// automatically generates subclass constructor and begins cfgMultiFunction method
 #define CFG_HEADER(structName) \
-	structName() { multiFunction(INIT_ALL,NULL,NULL,NULL,NULL,0,NULL); } \
+	structName() { cfgMultiFunction(CFG_INIT_ALL,NULL,NULL,NULL,NULL,0,NULL); } \
 	std::string getStructName() { return #structName; } \
-	int multiFunction(MFType mfType, std::string* str, std::string* subVar, \
+	int cfgMultiFunction(MFType mfType, std::string* str, std::string* subVar, \
 		std::istream* streamIn, std::ostream* streamOut,int indent,Configurator*other){ \
 		int retVal=0; \
 		structName* otherPtr; \
-		if(mfType==IS_EQUAL) {otherPtr = dynamic_cast<structName*>(other); \
+		if(mfType==CFG_COMPARE) {otherPtr = dynamic_cast<structName*>(other); \
 			if(!otherPtr) return 1; /*dynamic cast failed, types different*/ }
 
-// continues multiFunction method, called for each member varible in struct 
+// continues cfgMultiFunction method, called for each member varible in struct 
 #define CFG_ENTRY2(varName, defaultVal) \
-	if(mfType==INIT_ALL) {varName = defaultVal;retVal++;} \
-	else if(mfType==SET_STREAM && #varName==*str) { setFromStream(*streamIn,varName,*subVar);retVal++;}\
-	else if(mfType==WRITE_ALL) {*streamOut<<indentBy(indent)<<#varName<<"="; \
-		writeToStreamHelper(*streamOut,varName,indent); \
+	if(mfType==CFG_INIT_ALL) {varName = defaultVal;retVal++;} \
+	else if(mfType==CFG_SET && #varName==*str) { cfgSetFromStream(*streamIn,varName,*subVar);retVal++;}\
+	else if(mfType==CFG_WRITE_ALL) {*streamOut<<cfgIndentBy(indent)<<#varName<<"="; \
+		cfgWriteToStreamHelper(*streamOut,varName,indent); \
 		*streamOut<<std::endl;retVal++; \
 		if(streamOut->fail()) \
 		throwError("Configurator ("+getStructName()+") error, can't write variable: "+#varName);} \
-	else if(mfType==IS_EQUAL) { \
+	else if(mfType==CFG_COMPARE) { \
 		retVal+=cfgCompareHelper(this->varName,otherPtr->varName); }	
 
 // alternative to CFG_ENTRY2 used when default defaultVal is sufficient
-#define CFG_ENTRY1(varName) CFG_ENTRY2(varName, getDefaultVal(varName))
+#define CFG_ENTRY1(varName) CFG_ENTRY2(varName, cfgGetDefaultVal(varName))
 
-// calls multiFunction method of parent
+// calls cfgMultiFunction method of parent
 // allows for inheritance
 #define CFG_PARENT(parentName) \
-	int rc=parentName::multiFunction(mfType,str,subVar,streamIn,streamOut,indent,other); \
+	int rc=parentName::cfgMultiFunction(mfType,str,subVar,streamIn,streamOut,indent,other); \
 	retVal+=rc;
 	
 
-// closes out multiFunction method
+// closes out cfgMultiFunction method
 #define CFG_TAIL return retVal; }

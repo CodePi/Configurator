@@ -118,8 +118,8 @@ void Configurator::writeToFile(const std::string& filename){
 void Configurator::writeToStream(ostream& os,int indent){
 	// write struct to stream
 	if(indent>0) os<<"{\n"; //print braces on nested structs only
-	multiFunction(WRITE_ALL, NULL, NULL, NULL, &os, indent, NULL); 
-	if(indent>0) os<<Configurator::indentBy(indent-1)<<"}";
+	cfgMultiFunction(CFG_WRITE_ALL, NULL, NULL, NULL, &os, indent, NULL); 
+	if(indent>0) os<<Configurator::cfgIndentBy(indent-1)<<"}";
 }
 
 void Configurator::writeToString(string& str){
@@ -161,7 +161,7 @@ void Configurator::set(const std::string& varName, const std::string& val){
 void Configurator::set(const std::string& varName, std::istream& stream){
 	if(varName=="include"){ // e.g. "include = filename"
 		string filename;
-		setFromStream(stream,filename); //get filename
+		cfgSetFromStream(stream,filename); //get filename
 		readFile(filename);  //parse contents of file (recurse)
 	}else{ // set varName from contents of stream
 		// Check for '.' separated format, e.g. "a.b.c=1"
@@ -172,14 +172,14 @@ void Configurator::set(const std::string& varName, std::istream& stream){
 		if(pos!=string::npos) subVar = varName.substr(pos+1); //subsequent vars: e.g. "b.c"
 
 		// set value of variable by parsing stream
-		int rc=multiFunction(SET_STREAM,&baseVar,&subVar,&stream,NULL,0,NULL);
+		int rc=cfgMultiFunction(CFG_SET,&baseVar,&subVar,&stream,NULL,0,NULL);
 		if(rc==0) throwError("Configurator ("+getStructName()+") error, key not recognized: "+varName);
 		if(rc>1) throwError("Configurator ("+getStructName()+") error, multiple keys with the same name not allowed: "+varName);
 		if(!stream) throwError("Configurator ("+getStructName()+") error, parse error after: "+varName);
 	}
 }
 
-std::string Configurator::indentBy(int i){
+std::string Configurator::cfgIndentBy(int i){
 	// return i*2 spaces, for printing
 	std::string str;
 	for(int j=0;j<i;j++) str+="  ";
@@ -205,7 +205,7 @@ static char readuntil(istream& stream, string& str, const string& delimit){
 	return 0; //return 0 if end of stream
 }
 
-void Configurator::setFromStream(istream& ss, string& str, const std::string& subVar){
+void Configurator::cfgSetFromStream(istream& ss, string& str, const std::string& subVar){
 	// special handing of string (default handling only reads one word)
 	if(!subVar.empty()) { //subVar should be empty
 		ss.setstate(ios::failbit); //set fail bit to trigger error handling
@@ -217,7 +217,7 @@ void Configurator::setFromStream(istream& ss, string& str, const std::string& su
 	if(str == "''" || str == "\"\"") str = ""; // "" and '' indicate empty string
 }
 
-void Configurator::setFromStream(std::istream& ss, Configurator& cfg, const std::string& subVar){
+void Configurator::cfgSetFromStream(std::istream& ss, Configurator& cfg, const std::string& subVar){
 	// read struct from stream
 	if(!subVar.empty()) cfg.set(subVar,ss);  //handle a.b.c=1 format, recursively
 	else                cfg.readStream(ss);  //handle standard format (a=1)
@@ -232,13 +232,13 @@ static bool streql(const string&str1, const string&str2){
 	#endif
 }
 
-void Configurator::setFromStream(istream& ss, bool& b, const std::string& subVar){
+void Configurator::cfgSetFromStream(istream& ss, bool& b, const std::string& subVar){
 	if(!subVar.empty()) { //subVar should be empty
 		ss.setstate(ios::failbit); //set fail bit to trigger error handling
 		return;
 	}
 	string str;
-	setFromStream(ss,str);
+	cfgSetFromStream(ss,str);
 	str=stripSpaces(str);
 	if(streql(str,"true") || streql(str,"t") || streql(str,"1")){
 		b=true;
@@ -247,17 +247,17 @@ void Configurator::setFromStream(istream& ss, bool& b, const std::string& subVar
 	}else ss.setstate(ios::failbit); //set fail bit to trigger error handling
 }
 
-void Configurator::writeToStreamHelper(std::ostream& stream, Configurator& cfg, int indent){
+void Configurator::cfgWriteToStreamHelper(std::ostream& stream, Configurator& cfg, int indent){
 	// write struct to stream
 	cfg.writeToStream(stream,indent+1);
 }
 
-void Configurator::writeToStreamHelper(std::ostream& stream, bool& b, int indent){
+void Configurator::cfgWriteToStreamHelper(std::ostream& stream, bool& b, int indent){
 	if(b) stream<<"true";
 	else  stream<<"false";
 }
 
-void Configurator::writeToStreamHelper(std::ostream& stream, std::string& str, int indent){
+void Configurator::cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent){
 	if(str.empty()) stream<<"''";  //empty string indicated by ''
 	else {
 		stringstream tmpSs(str);
@@ -272,5 +272,5 @@ void Configurator::writeToStreamHelper(std::ostream& stream, std::string& str, i
 }
 
 int Configurator::cfgCompareHelper(Configurator& a, Configurator& b){
-	return a.multiFunction(IS_EQUAL, NULL,NULL,NULL,NULL,0,&b);
+	return a.cfgMultiFunction(CFG_COMPARE, NULL,NULL,NULL,NULL,0,&b);
 }
