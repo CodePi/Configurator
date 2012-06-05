@@ -24,6 +24,7 @@
 #include<string>
 #include<vector>
 #include<set>
+#include<map>
 #include<sstream>
 #include<fstream>
 #include<stdexcept>
@@ -138,6 +139,15 @@ protected:
 		cfgInsertFromStream(is, std::inserter(set, set.end()), subVar);
 	}
 
+	/// cfgSetFromStream for map 
+	/// Parses map from stream of format: "[key1, val1, key2, val2]" 
+	/// (commas required for strings, optional for others)
+	template <typename T1, typename T2>
+	static void cfgSetFromStream(std::istream& is, std::map<T1,T2>& map, const std::string& subVar=""){
+		map.clear();
+		cfgInsertFromStream(is, std::inserter(map, map.end()), subVar);
+	}	
+
 	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
@@ -194,6 +204,13 @@ protected:
 		cfgWriteToStreamHelper(stream, set.begin(), set.end(), indent);
 	}
 
+	/// cfgWriteToStreamHelper for maps
+	/// Prints map to stream in format: "[key1,val1,key2,val2]"
+	template <typename T1, typename T2>
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::map<T1,T2>& map, int indent){
+		cfgWriteToStreamHelper(stream, map.begin(), map.end(), indent);
+	}
+
 	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
@@ -243,6 +260,11 @@ protected:
 
 	template <typename T>
 	static int cfgCompareHelper(std::set<T>& a, std::set<T>& b){
+		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+	}
+
+	template <typename T1, typename T2>
+	static int cfgCompareHelper(std::map<T1,T2>& a, std::map<T1,T2>& b){
 		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
 	}
 
