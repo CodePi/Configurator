@@ -170,7 +170,7 @@ protected:
 	template <typename T1, typename T2>
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::pair<T1,T2>& pair, int indent){
 		cfgWriteToStreamHelper(stream, pair.first, indent);
-		stream << ", ";
+		stream << ",";
 		cfgWriteToStreamHelper(stream, pair.second, indent);
 	}
 
