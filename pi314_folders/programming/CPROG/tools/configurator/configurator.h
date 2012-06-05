@@ -108,11 +108,12 @@ protected:
 	template <typename T1, typename T2>
 	static void cfgSetFromStream(std::istream& is, std::pair<T1,T2>& pair, const std::string& subVar=""){
 		cfgSetFromStream(is, pair.first, subVar);
-		do{ // find beginning of second
-			char c = is.peek();
-			if(c==' ' || c==',' || c=='\r' || c=='\n' || c=='\t') is.ignore();
-			else break;
-		}while(true); 
+		// push to next element, removing comments
+		while(isspace(is.peek())||is.peek()==','||is.peek()=='#') {
+			std::string dumpStr;
+			if(is.peek()=='#') getline(is,dumpStr);
+			else is.ignore();
+		}
 		cfgSetFromStream(is, pair.second, subVar);
 	}
 
