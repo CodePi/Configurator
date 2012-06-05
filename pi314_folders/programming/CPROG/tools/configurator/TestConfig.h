@@ -27,6 +27,7 @@ struct TestConfig:public Configurator{
 	std::set<int> intSet;
 	std::pair<int, std::string> pair;
 	std::pair<std::string, float> pair2;
+	std::map<std::string, int> map;
 	std::string n;
 	SubConfig1 s;
 	std::vector<SubConfig1> t;
@@ -40,6 +41,7 @@ struct TestConfig:public Configurator{
 	CFG_ENTRY1(intSet)
 	CFG_ENTRY1(pair)
 	CFG_ENTRY1(pair2)
+	CFG_ENTRY1(map)
 	CFG_ENTRY2(n,"hello")
 	CFG_ENTRY1(s)
 	CFG_ENTRY1(t)
