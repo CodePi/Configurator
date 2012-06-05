@@ -205,11 +205,7 @@ static char readuntil(istream& stream, string& str, const string& delimit){
 	return 0; //return 0 if end of stream
 }
 
-void Configurator::cfgSetFromStream(istream& ss, const string& str_const, const std::string& subVar){
-	// workaround: a map's value_type is pair<const T1, T2> this casts off the first const
-	// TODO: figure out cleaner way
-	string& str = const_cast<string&>(str_const);
-
+void Configurator::cfgSetFromStream(istream& ss, string& str, const std::string& subVar){
 	// special handing of string (default handling only reads one word)
 	if(!subVar.empty()) { //subVar should be empty
 		ss.setstate(ios::failbit); //set fail bit to trigger error handling
