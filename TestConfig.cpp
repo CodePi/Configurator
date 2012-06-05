@@ -30,6 +30,9 @@ int main(){
 		tc.intSet.insert(100);
 		tc.intSet.insert(200);
 
+		tc.pair = make_pair(123, "test test");
+		tc.pair2 = make_pair("test2 test", 1.1);
+
 		tc.writeToStream(cout);
 
 		string str = tc.toString();

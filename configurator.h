@@ -104,12 +104,24 @@ protected:
 	/// cfgSetFromStream for bool (allows (t,true,1,f,false,0))
 	static void cfgSetFromStream(std::istream& ss, bool& b, const std::string& subVar="");
 
-	/// setFromString for any iterator
+	/// cfgSetFromStream for std::pair
+	template <typename T1, typename T2>
+	static void cfgSetFromStream(std::istream& is, std::pair<T1,T2>& pair, const std::string& subVar=""){
+		cfgSetFromStream(is, pair.first, subVar);
+		do{ // find beginning of second
+			char c = is.peek();
+			if(c==' ' || c==',' || c=='\r' || c=='\n' || c=='\t') is.ignore();
+			else break;
+		}while(true); 
+		cfgSetFromStream(is, pair.second, subVar);
+	}
+
+	/// cfgSetFromStream helper for any iterators
 	/// Parses container from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename Inserter>
 	static void cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar="");
 
-	/// setFromString for vectors
+	/// cfgSetFromStream for vectors
 	/// Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
 	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar=""){
@@ -117,7 +129,7 @@ protected:
 		cfgInsertFromStream(is, std::back_inserter(vec), subVar);
 	}
 
-	/// setFromString for sets
+	/// cfgSetFromStream for sets
 	/// Parses sets from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
 	static void cfgSetFromStream(std::istream& is, std::set<T>& set, const std::string& subVar=""){
@@ -150,8 +162,16 @@ protected:
 	/// cfgWriteToStreamHelper for bool (writes true/false)
 	static void cfgWriteToStreamHelper(std::ostream& stream, bool& b, int indent);
 
-	/// cfgWriteToStreamHelper for string (writes true/false)
+	/// cfgWriteToStreamHelper for string 
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent);
+
+	/// cfgWriteToStreamHelper for std::pair
+	template <typename T1, typename T2>
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::pair<T1,T2>& pair, int indent){
+		cfgWriteToStreamHelper(stream, pair.first, indent);
+		stream << ", ";
+		cfgWriteToStreamHelper(stream, pair.second, indent);
+	}
 
 	/// cfgWriteToStreamHelper for anything with iterators
 	/// Prints container to stream in format: "[1,2,3,4,5]"
@@ -188,6 +208,11 @@ protected:
 
 	/// cfgCompareHelper for Configurator
 	static int cfgCompareHelper(Configurator& a, Configurator& b);
+
+	template <typename T1, typename T2>
+	static int cfgCompareHelper(std::pair<T1,T2>& a, std::pair<T1,T2>& b){
+		return cfgCompareHelper(a.first, b.first) + cfgCompareHelper(a.second, b.second);
+	}
 
 	template <typename Iterator>
 	static int cfgCompareHelper(Iterator start1, Iterator end1, Iterator start2, Iterator end2){
