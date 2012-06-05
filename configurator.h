@@ -103,6 +103,11 @@ protected:
 	/// cfgSetFromStream for bool (allows (t,true,1,f,false,0))
 	static void cfgSetFromStream(std::istream& ss, bool& b, const std::string& subVar="");
 
+	/// setFromString for any iterator
+	/// Parses container from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
+	template <typename Inserter>
+	static void cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar="");
+
 	/// setFromString for vectors
 	/// Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
@@ -110,11 +115,6 @@ protected:
 		vec.clear();
 		cfgInsertFromStream(is, std::back_inserter(vec), subVar);
 	}
-
-	/// setFromString for any iterator
-	/// Parses container from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
-	template <typename Inserter>
-	static void cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar="");
 
 	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
@@ -144,18 +144,18 @@ protected:
 	/// cfgWriteToStreamHelper for string (writes true/false)
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent);
 
+	/// cfgWriteToStreamHelper for anything with iterators
+	/// Prints container to stream in format: "[1,2,3,4,5]"
+	template <typename Iterator>
+	static void cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
+		Iterator end, int indent);
+
 	/// cfgWriteToStreamHelper for vectors
 	/// Prints vector to stream in format: "[1,2,3,4,5]"
 	template <typename T>
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent){
 		cfgWriteToStreamHelper(stream, vec.begin(), vec.end(), indent);
 	}
-
-	/// cfgWriteToStreamHelper for anything with iterators
-	/// Prints container to stream in format: "[1,2,3,4,5]"
-	template <typename Iterator>
-	static void cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
-		Iterator end, int indent);
 
 	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
@@ -173,11 +173,6 @@ protected:
 	/// cfgCompareHelper for Configurator
 	static int cfgCompareHelper(Configurator& a, Configurator& b);
 
-	template <typename T>
-	static int cfgCompareHelper(std::vector<T>& a, std::vector<T>& b){
-		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
-	}
-	
 	template <typename Iterator>
 	static int cfgCompareHelper(Iterator start1, Iterator end1, Iterator start2, Iterator end2){
 		int retVal = 0;
@@ -199,6 +194,11 @@ protected:
 			return !(a==b);
 	}
 	
+	template <typename T>
+	static int cfgCompareHelper(std::vector<T>& a, std::vector<T>& b){
+		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+	}
+
 	/// Used by TTHelper::is_configurator to identify decendents of Configurator
 	typedef void is_configurator;
 
