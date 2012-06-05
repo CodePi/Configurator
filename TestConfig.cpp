@@ -30,6 +30,9 @@ int main(){
 		tc.intSet.insert(100);
 		tc.intSet.insert(200);
 
+		tc.map["hello"] = 789;
+		tc.map["goodbye"] = 987;
+
 		tc.pair = make_pair(123, "test test");
 		tc.pair2 = make_pair("test2 test", 1.1);
 

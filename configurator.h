@@ -97,7 +97,7 @@ protected:
 	/// cfgSetFromStream for strings.  
 	/// by default, operator>> will only read one word at a time
 	/// this one will read until a delimiter: ,#}]\t\r\n
-	static void cfgSetFromStream(std::istream& ss, std::string& str, const std::string& subVar="");
+	static void cfgSetFromStream(std::istream& ss, const std::string& str, const std::string& subVar="");
 
 	/// cfgSetFromStream for Configurator descendants
 	static void cfgSetFromStream(std::istream& ss, Configurator& cfg, const std::string& subVar="");
@@ -153,7 +153,10 @@ protected:
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
-		cfgSetFromStream(std::istream& ss, T& val, const std::string& subVar=""){
+		cfgSetFromStream(std::istream& ss, const T& val_const, const std::string& subVar=""){
+			// workaround: a map's value_type is pair<const T1, T2> this casts off the first const
+			// TODO: figure out cleaner way
+			T& val = const_cast<T&>(val_const); 
 			if(!subVar.empty()) { //subVar should be empty
 				ss.setstate(std::ios::failbit); //set fail bit to trigger error handling
 				return;
@@ -295,7 +298,7 @@ void Configurator::cfgInsertFromStream(std::istream& is, Inserter inserter, cons
 		}
 
 		// read element and add to vector
-		Inserter::container_type::value_type val;
+		typename Inserter::container_type::value_type val;
 		cfgSetFromStream(is,val);
 		if(is) {
 			*inserter = val;
