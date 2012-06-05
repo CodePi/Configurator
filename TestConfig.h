@@ -24,6 +24,7 @@ struct TestConfig:public Configurator{
 
 	int jjj;
 	std::vector<int> k;
+	std::set<int> intSet;
 	std::string n;
 	SubConfig1 s;
 	std::vector<SubConfig1> t;
@@ -34,6 +35,7 @@ struct TestConfig:public Configurator{
 	CFG_HEADER(TestConfig)
 	CFG_ENTRY2(jjj,12)
 	CFG_ENTRY1(k)
+	CFG_ENTRY1(intSet)
 	CFG_ENTRY2(n,"hello")
 	CFG_ENTRY1(s)
 	CFG_ENTRY1(t)

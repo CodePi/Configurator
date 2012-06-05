@@ -27,6 +27,9 @@ int main(){
 
 		tc.readFile("file.txt");
 
+		tc.intSet.insert(100);
+		tc.intSet.insert(200);
+
 		tc.writeToStream(cout);
 
 		string str = tc.toString();

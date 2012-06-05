@@ -23,6 +23,7 @@
 
 #include<string>
 #include<vector>
+#include<set>
 #include<sstream>
 #include<fstream>
 #include<stdexcept>
@@ -116,6 +117,14 @@ protected:
 		cfgInsertFromStream(is, std::back_inserter(vec), subVar);
 	}
 
+	/// setFromString for sets
+	/// Parses sets from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
+	template <typename T>
+	static void cfgSetFromStream(std::istream& is, std::set<T>& set, const std::string& subVar=""){
+		set.clear();
+		cfgInsertFromStream(is, std::inserter(set, set.end()), subVar);
+	}
+
 	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
@@ -157,6 +166,13 @@ protected:
 		cfgWriteToStreamHelper(stream, vec.begin(), vec.end(), indent);
 	}
 
+	/// cfgWriteToStreamHelper for sets
+	/// Prints set to stream in format: "[1,2,3,4,5]"
+	template <typename T>
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::set<T>& set, int indent){
+		cfgWriteToStreamHelper(stream, set.begin(), set.end(), indent);
+	}
+
 	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
@@ -196,6 +212,11 @@ protected:
 	
 	template <typename T>
 	static int cfgCompareHelper(std::vector<T>& a, std::vector<T>& b){
+		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+	}
+
+	template <typename T>
+	static int cfgCompareHelper(std::set<T>& a, std::set<T>& b){
 		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
 	}
 
@@ -243,12 +264,12 @@ void Configurator::cfgInsertFromStream(std::istream& is, Inserter inserter, cons
 }
 
 // cfgWriteToStreamHelper for vectors
-// Prints vector to stream in format: "[1,2,3,4,5]"
+// Prints container to stream in format: "[1,2,3,4,5]"
 template <typename Iterator>
 void Configurator::cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
 		Iterator end, int indent){
 	stream<<"[";
-	for(Iterator i=start; i<end; i++){
+	for(Iterator i=start; i!=end; i++){
 		if(i!=start) stream<<",";
 		cfgWriteToStreamHelper(stream,*i,indent);
 	}
