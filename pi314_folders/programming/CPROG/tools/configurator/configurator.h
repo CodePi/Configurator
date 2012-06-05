@@ -97,7 +97,7 @@ protected:
 	/// cfgSetFromStream for strings.  
 	/// by default, operator>> will only read one word at a time
 	/// this one will read until a delimiter: ,#}]\t\r\n
-	static void cfgSetFromStream(std::istream& ss, const std::string& str, const std::string& subVar="");
+	static void cfgSetFromStream(std::istream& ss, std::string& str, const std::string& subVar="");
 
 	/// cfgSetFromStream for Configurator descendants
 	static void cfgSetFromStream(std::istream& ss, Configurator& cfg, const std::string& subVar="");
@@ -105,10 +105,17 @@ protected:
 	/// cfgSetFromStream for bool (allows (t,true,1,f,false,0))
 	static void cfgSetFromStream(std::istream& ss, bool& b, const std::string& subVar="");
 
+	/// helper function
+	/// workaround: a map's value_type is pair<const T1, T2> this casts off the const
+	template <typename T>
+	static T& remove_const(const T& val){
+		return const_cast<T&>(val);
+	}
+
 	/// cfgSetFromStream for std::pair
 	template <typename T1, typename T2>
 	static void cfgSetFromStream(std::istream& is, std::pair<T1,T2>& pair, const std::string& subVar=""){
-		cfgSetFromStream(is, pair.first, subVar);
+		cfgSetFromStream(is, remove_const(pair.first), subVar);
 		// push to next element, removing comments
 		while(isspace(is.peek())||is.peek()==','||is.peek()=='#') {
 			std::string dumpStr;
@@ -153,10 +160,7 @@ protected:
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
-		cfgSetFromStream(std::istream& ss, const T& val_const, const std::string& subVar=""){
-			// workaround: a map's value_type is pair<const T1, T2> this casts off the first const
-			// TODO: figure out cleaner way
-			T& val = const_cast<T&>(val_const); 
+		cfgSetFromStream(std::istream& ss,  T& val, const std::string& subVar=""){
 			if(!subVar.empty()) { //subVar should be empty
 				ss.setstate(std::ios::failbit); //set fail bit to trigger error handling
 				return;
