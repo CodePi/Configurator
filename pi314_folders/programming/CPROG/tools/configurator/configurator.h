@@ -27,6 +27,7 @@
 #include<fstream>
 #include<stdexcept>
 #include<iomanip>
+#include <iterator>
 
 #include"type_traits_helper.h"
 
@@ -105,7 +106,15 @@ protected:
 	/// setFromString for vectors
 	/// Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
-	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar="");
+	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar=""){
+		vec.clear();
+		cfgInsertFromStream(is, std::back_inserter(vec), subVar);
+	}
+
+	/// setFromString for any iterator
+	/// Parses container from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
+	template <typename Inserter>
+	static void cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar="");
 
 	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
@@ -138,7 +147,15 @@ protected:
 	/// cfgWriteToStreamHelper for vectors
 	/// Prints vector to stream in format: "[1,2,3,4,5]"
 	template <typename T>
-	static void cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent);
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent){
+		cfgWriteToStreamHelper(stream, vec.begin(), vec.end(), indent);
+	}
+
+	/// cfgWriteToStreamHelper for anything with iterators
+	/// Prints container to stream in format: "[1,2,3,4,5]"
+	template <typename Iterator>
+	static void cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
+		Iterator end, int indent);
 
 	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
@@ -158,11 +175,20 @@ protected:
 
 	template <typename T>
 	static int cfgCompareHelper(std::vector<T>& a, std::vector<T>& b){
+		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+	}
+	
+	template <typename Iterator>
+	static int cfgCompareHelper(Iterator start1, Iterator end1, Iterator start2, Iterator end2){
 		int retVal = 0;
-		if(a.size()!=b.size()) return 1;
-		for(size_t i=0;i<a.size();i++){
-			retVal+=cfgCompareHelper(a[i],b[i]);
+		Iterator a = start1;
+		Iterator b = start2;
+		while(a!=end1 && b!=end2){
+			retVal+=cfgCompareHelper(*a,*b);
+			a++; b++;
 		}
+		if(a!=end1 || b!=end2) return 1; // containers not same size
+
 		return retVal;
 	}
 	
@@ -183,13 +209,12 @@ protected:
 
 // setFromString for vectors
 // Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
-template <typename T>
-void Configurator::cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar){
+template <typename Inserter>
+void Configurator::cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar){
 	if(!subVar.empty()) { //subVar should be empty
 		is.setstate(std::ios::failbit); //set fail bit to trigger error handling
 		return;
 	}
-	vec.clear();
 	std::string line;
 	// find first element
 	while(isspace(is.peek())||is.peek()=='[') is.ignore();
@@ -201,9 +226,12 @@ void Configurator::cfgSetFromStream(std::istream& is, std::vector<T>& vec, const
 		}
 
 		// read element and add to vector
-		T val;
+		Inserter::container_type::value_type val;
 		cfgSetFromStream(is,val);
-		if(is) vec.push_back(val);
+		if(is) {
+			*inserter = val;
+			inserter++;
+		}
 
 		// push to next element, removing comments
 		while(isspace(is.peek())||is.peek()==','||is.peek()=='#') {
@@ -216,12 +244,13 @@ void Configurator::cfgSetFromStream(std::istream& is, std::vector<T>& vec, const
 
 // cfgWriteToStreamHelper for vectors
 // Prints vector to stream in format: "[1,2,3,4,5]"
-template <typename T>
-void Configurator::cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent){
+template <typename Iterator>
+void Configurator::cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
+		Iterator end, int indent){
 	stream<<"[";
-	for(size_t i=0;i<vec.size();i++){
-		if(i>0) stream<<",";
-		cfgWriteToStreamHelper(stream,vec[i],indent);
+	for(Iterator i=start; i<end; i++){
+		if(i!=start) stream<<",";
+		cfgWriteToStreamHelper(stream,*i,indent);
 	}
 	stream<<"]";
 }
