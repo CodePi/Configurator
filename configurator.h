@@ -127,23 +127,21 @@ protected:
 
 	/// cfgSetFromStream helper for any iterators
 	/// Parses container from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
-	template <typename Inserter>
-	static void cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar="");
+	template <typename Container>
+	static void cfgContainerSetFromStream(std::istream& is, Container& container, const std::string& subVar="");
 
 	/// cfgSetFromStream for vectors
 	/// Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
 	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar=""){
-		vec.clear();
-		cfgInsertFromStream(is, std::back_inserter(vec), subVar);
+		cfgContainerSetFromStream(is, vec, subVar);
 	}
 
 	/// cfgSetFromStream for sets
 	/// Parses sets from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename T>
 	static void cfgSetFromStream(std::istream& is, std::set<T>& set, const std::string& subVar=""){
-		set.clear();
-		cfgInsertFromStream(is, std::inserter(set, set.end()), subVar);
+		cfgContainerSetFromStream(is, set, subVar);
 	}
 
 	/// cfgSetFromStream for map 
@@ -151,8 +149,7 @@ protected:
 	/// (commas required for strings, optional for others)
 	template <typename T1, typename T2>
 	static void cfgSetFromStream(std::istream& is, std::map<T1,T2>& map, const std::string& subVar=""){
-		map.clear();
-		cfgInsertFromStream(is, std::inserter(map, map.end()), subVar);
+		cfgContainerSetFromStream(is, map, subVar);
 	}	
 
 	/// cfgSetFromStream for all other types
@@ -193,29 +190,28 @@ protected:
 
 	/// cfgWriteToStreamHelper for anything with iterators
 	/// Prints container to stream in format: "[1,2,3,4,5]"
-	template <typename Iterator>
-	static void cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
-		Iterator end, int indent);
+	template <typename Container>
+	static void cfgContainerWriteToStreamHelper(std::ostream& stream, Container& container, int indent);
 
 	/// cfgWriteToStreamHelper for vectors
 	/// Prints vector to stream in format: "[1,2,3,4,5]"
 	template <typename T>
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::vector<T>& vec, int indent){
-		cfgWriteToStreamHelper(stream, vec.begin(), vec.end(), indent);
+		cfgContainerWriteToStreamHelper(stream, vec, indent);
 	}
 
 	/// cfgWriteToStreamHelper for sets
 	/// Prints set to stream in format: "[1,2,3,4,5]"
 	template <typename T>
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::set<T>& set, int indent){
-		cfgWriteToStreamHelper(stream, set.begin(), set.end(), indent);
+		cfgContainerWriteToStreamHelper(stream, set, indent);
 	}
 
 	/// cfgWriteToStreamHelper for maps
 	/// Prints map to stream in format: "[key1,val1,key2,val2]"
 	template <typename T1, typename T2>
 	static void cfgWriteToStreamHelper(std::ostream& stream, std::map<T1,T2>& map, int indent){
-		cfgWriteToStreamHelper(stream, map.begin(), map.end(), indent);
+		cfgContainerWriteToStreamHelper(stream, map, indent);
 	}
 
 	/// cfgWriteToStreamHelper for all other types
@@ -239,16 +235,16 @@ protected:
 		return cfgCompareHelper(a.first, b.first) + cfgCompareHelper(a.second, b.second);
 	}
 
-	template <typename Iterator>
-	static int cfgCompareHelper(Iterator start1, Iterator end1, Iterator start2, Iterator end2){
+	template <typename Container>
+	static int cfgContainerCompareHelper(Container& a, Container& b){
 		int retVal = 0;
-		Iterator a = start1;
-		Iterator b = start2;
-		while(a!=end1 && b!=end2){
-			retVal+=cfgCompareHelper(*a,*b);
-			a++; b++;
+		Container::iterator i = a.begin();
+		Container::iterator j = b.begin();
+		while(i!=a.end() && j!=b.end()){
+			retVal+=cfgCompareHelper(*i,*j);
+			i++; j++;
 		}
-		if(a!=end1 || b!=end2) return 1; // containers not same size
+		if(i!=a.end() || j!=b.end()) return 1; // containers not same size
 
 		return retVal;
 	}
@@ -262,17 +258,17 @@ protected:
 	
 	template <typename T>
 	static int cfgCompareHelper(std::vector<T>& a, std::vector<T>& b){
-		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+		return cfgContainerCompareHelper(a,b);
 	}
 
 	template <typename T>
 	static int cfgCompareHelper(std::set<T>& a, std::set<T>& b){
-		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+		return cfgContainerCompareHelper(a,b);
 	}
 
 	template <typename T1, typename T2>
 	static int cfgCompareHelper(std::map<T1,T2>& a, std::map<T1,T2>& b){
-		return cfgCompareHelper(a.begin(), a.end(), b.begin(), b.end());
+		return cfgContainerCompareHelper(a,b);
 	}
 
 	/// Used by TTHelper::is_configurator to identify decendents of Configurator
@@ -285,13 +281,14 @@ protected:
 
 // setFromString for vectors
 // Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
-template <typename Inserter>
-void Configurator::cfgInsertFromStream(std::istream& is, Inserter inserter, const std::string& subVar){
+template <typename Container>
+void Configurator::cfgContainerSetFromStream(std::istream& is, Container& container, const std::string& subVar){
 	if(!subVar.empty()) { //subVar should be empty
 		is.setstate(std::ios::failbit); //set fail bit to trigger error handling
 		return;
 	}
 	std::string line;
+	container.clear();
 	// find first element
 	while(isspace(is.peek())||is.peek()=='[') is.ignore();
 	while(is.good()){
@@ -302,12 +299,9 @@ void Configurator::cfgInsertFromStream(std::istream& is, Inserter inserter, cons
 		}
 
 		// read element and add to vector
-		typename Inserter::container_type::value_type val;
+		typename Container::value_type val;
 		cfgSetFromStream(is,val);
-		if(is) {
-			*inserter = val;
-			inserter++;
-		}
+		if(is) container.insert(container.end(),val);
 
 		// push to next element, removing comments
 		while(isspace(is.peek())||is.peek()==','||is.peek()=='#') {
@@ -320,12 +314,11 @@ void Configurator::cfgInsertFromStream(std::istream& is, Inserter inserter, cons
 
 // cfgWriteToStreamHelper for vectors
 // Prints container to stream in format: "[1,2,3,4,5]"
-template <typename Iterator>
-void Configurator::cfgWriteToStreamHelper(std::ostream& stream, Iterator start, 
-		Iterator end, int indent){
+template <typename Container>
+void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Container& c, int indent){
 	stream<<"[";
-	for(Iterator i=start; i!=end; i++){
-		if(i!=start) stream<<",";
+	for(Container::iterator i=c.begin(); i!=c.end(); i++){
+		if(i!=c.begin()) stream<<",";
 		cfgWriteToStreamHelper(stream,*i,indent);
 	}
 	stream<<"]";
