@@ -21,6 +21,7 @@
 
 #include "configurator.h"
 #include <fstream>
+#include <string.h>
 
 #ifdef __GNUC__
 #include <strings.h>

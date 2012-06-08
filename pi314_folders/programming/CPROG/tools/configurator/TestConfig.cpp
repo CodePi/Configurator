@@ -52,5 +52,7 @@ int main(){
 		cout<<e.what()<<endl;
 	}
 
+	#ifndef __GNUC__ 
 	getchar();
+	#endif
 }

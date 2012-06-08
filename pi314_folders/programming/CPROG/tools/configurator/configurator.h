@@ -238,8 +238,8 @@ protected:
 	template <typename Container>
 	static int cfgContainerCompareHelper(Container& a, Container& b){
 		int retVal = 0;
-		Container::iterator i = a.begin();
-		Container::iterator j = b.begin();
+		typename Container::iterator i = a.begin();
+		typename Container::iterator j = b.begin();
 		while(i!=a.end() && j!=b.end()){
 			retVal+=cfgCompareHelper(*i,*j);
 			i++; j++;
@@ -317,7 +317,7 @@ void Configurator::cfgContainerSetFromStream(std::istream& is, Container& contai
 template <typename Container>
 void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Container& c, int indent){
 	stream<<"[";
-	for(Container::iterator i=c.begin(); i!=c.end(); i++){
+	for(typename Container::iterator i=c.begin(); i!=c.end(); i++){
 		if(i!=c.begin()) stream<<",";
 		cfgWriteToStreamHelper(stream,*i,indent);
 	}
