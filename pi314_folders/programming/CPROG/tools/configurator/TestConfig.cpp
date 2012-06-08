@@ -53,6 +53,7 @@ int main(){
 	}
 
 	#ifndef __GNUC__ 
+	cout << "Press enter to exit.\n";
 	getchar();
 	#endif
 }
