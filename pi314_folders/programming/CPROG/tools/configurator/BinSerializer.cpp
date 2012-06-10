@@ -18,6 +18,7 @@
 #include "BinSerializer.h"
 #include <sstream>
 #include <fstream>
+#include <stdexcept>
 
 using namespace std;
 
@@ -52,7 +53,8 @@ void BinSerializer::serialize(vector<char>& blob){
 	int size = getSerializeSize();
 	blob.resize(size);                    // alloc enough space for serialization
 	StreambufWrapper sb(&blob[0], size);  // use blob as streambuf
-	serialize(ostream(&sb));              // serialize to streambuf
+	ostream os(&sb);                      // wrap ostream around blob
+	serialize(os);                        // serialize to streambuf
 }
 
 int BinSerializer::serialize(char* blob, int bufferSize){
@@ -60,7 +62,8 @@ int BinSerializer::serialize(char* blob, int bufferSize){
 	int size = getSerializeSize();
 	if(size > bufferSize) throwError("serialize: bufferSize too small");
 	StreambufWrapper sb(blob, bufferSize); // use blob as streambuf
-	serialize(ostream(&sb));               // serialize to streambuf
+	ostream os(&sb);                       // wrap ostream around blob
+	serialize(os);                         // serialize to streambuf
 	return size;
 }
 
@@ -98,7 +101,8 @@ void BinSerializer::deserialize(vector<char>& blob){
 void BinSerializer::deserialize(const char* blob, int bufferSize){
 	// wrap blob as streambuf and deserialize
 	StreambufWrapper sb((char*)blob,bufferSize); // use blob as streambuf
-	deserialize(istream(&sb));                   // deserialize from streambuf
+	istream is(&sb);                             // wrap sb in istream
+	deserialize(is);                             // deserialize from streambuf
 }
 
 void BinSerializer::deserializeFile(const char* filename){
