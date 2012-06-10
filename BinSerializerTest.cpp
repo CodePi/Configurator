@@ -91,7 +91,7 @@ int main(){
 
 		tc.dumpText(cout);
 
-	}catch(runtime_error& e){
+	}catch(exception& e){
 		cout << "runtime_error caught: " << e.what() << endl;
 	}
 
