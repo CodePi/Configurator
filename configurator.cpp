@@ -33,7 +33,7 @@ using namespace std;
 
 //////////////////////////////////////////////////////////////////////
 // StreambufWrapper: Helper class for wrapping a char* without copying
-// This allows use of a c-style array a streambuf
+// This allows use of a c-style array as a streambuf
 // The streambuf can then be used in a istream or ostream
 
 class StreambufWrapper : public streambuf {
