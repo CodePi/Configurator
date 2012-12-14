@@ -21,17 +21,18 @@
 
 #pragma once
 
-#include<string>
-#include<vector>
-#include<set>
-#include<map>
-#include<sstream>
-#include<fstream>
-#include<stdexcept>
-#include<iomanip>
+#include <string>
+#include <vector>
+#include <set>
+#include <map>
+#include <sstream>
+#include <fstream>
+#include <stdexcept>
+#include <iomanip>
 #include <iterator>
 
-#include"type_traits_helper.h"
+#include "type_traits_helper.h"
+#include "Optional.h"
 
 #ifdef _MSC_VER // if Visual Studio
 #pragma warning( error : 4002 ) // treat macros with incorrect number of args as error
@@ -155,6 +156,12 @@ protected:
 		cfgContainerSetFromStream(is, map, subVar);
 	}	
 
+	/// cfgSetFromStream for Optional<T>
+	template <typename T>
+	static void cfgSetFromStream(std::istream& is, Optional<T>& val, const std::string& subVar=""){
+		cfgSetFromStream(is, (T&)val, subVar);
+	}
+
 	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
@@ -218,6 +225,15 @@ protected:
 		cfgContainerWriteToStreamHelper(stream, map, indent);
 	}
 
+	/// cfgWriteToStreamHelper for Optional<T>
+	/// Prints contents of Optional.
+	template <typename T>
+	static void cfgWriteToStreamHelper(std::ostream& stream, Optional<T>& opt, int indent){
+		// shouldn't be able to get this far if not set
+		if(!opt.isSet()) throw runtime_error("cfgWriteToStreamHelper Optional<T>: this shouldn't happen");
+		cfgWriteToStreamHelper(stream, (T&)opt, indent);
+	}
+
 	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
@@ -275,8 +291,26 @@ protected:
 		return cfgContainerCompareHelper(a,b);
 	}
 
+	template <typename T>
+	static int cfgCompareHelper(Optional<T>& a, Optional<T>& b){
+		if(!a.isSet() && !b.isSet()) return 0;  // both empty, so same
+		if(!a.isSet() || !b.isSet()) return 1;  // one empty, so different
+		return cfgCompareHelper((T&)a,(T&)b);
+	}
+
 	/// Used by TTHelper::is_configurator to identify decendents of Configurator
 	typedef void is_configurator;
+
+	/// returns true if optional type and value is set
+	template<typename T>
+	static bool isSetOrNotOptional(Optional<T>& opt){
+		return opt.isSet();
+	}
+
+	/// returns true if not instance of Optional<T>
+	static bool isSetOrNotOptional(...){
+		return true;
+	}
 
 };
 
@@ -358,15 +392,20 @@ void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Contain
 
 // continues cfgMultiFunction method, called for each member variable in struct 
 #define CFG_ENTRY2(varName, defaultVal) \
-	if(mfType==CFG_INIT_ALL) {varName = defaultVal;retVal++;} \
-	else if(mfType==CFG_SET && #varName==*str) { cfgSetFromStream(*streamIn,varName,*subVar);retVal++;}\
-	else if(mfType==CFG_WRITE_ALL) {*streamOut<<cfgIndentBy(indent)<<#varName<<"="; \
-		cfgWriteToStreamHelper(*streamOut,varName,indent); \
-		*streamOut<<std::endl;retVal++; \
-		if(streamOut->fail()) \
-		throwError("Configurator ("+getStructName()+") error, can't write variable: "+#varName);} \
-	else if(mfType==CFG_COMPARE) { \
-		retVal+=cfgCompareHelper(this->varName,otherPtr->varName); }	
+	if(mfType==CFG_INIT_ALL) { \
+		if(isSetOrNotOptional(varName)) {varName = defaultVal;retVal++;} \
+    } else if(mfType==CFG_SET && #varName==*str) { cfgSetFromStream(*streamIn,varName,*subVar);retVal++;} \
+	else if(mfType==CFG_WRITE_ALL) { \
+		if(isSetOrNotOptional(varName)) { \
+			*streamOut<<cfgIndentBy(indent)<<#varName<<"="; \
+			cfgWriteToStreamHelper(*streamOut,varName,indent); \
+			*streamOut<<std::endl;retVal++; \
+			if(streamOut->fail()) \
+				throwError("Configurator ("+getStructName()+") error, can't write variable: "+#varName); \
+		} \
+	} else if(mfType==CFG_COMPARE) { \
+		retVal+=cfgCompareHelper(this->varName,otherPtr->varName); \
+	}
 
 // alternative to CFG_ENTRY2 used when default defaultVal is sufficient
 #define CFG_ENTRY1(varName) CFG_ENTRY2(varName, cfgGetDefaultVal(varName))
