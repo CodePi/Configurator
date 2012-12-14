@@ -92,11 +92,12 @@ protected:
 	// Used internally by cfgMultiFunction
 	// Sets value of val based on contents of stream
 	// subVar is for '.' separated nested structs, e.g. "a.b=5"
-	// Five definitions below: Configurator, string, vector, bool, and other
+	// Overloaded for multiple types: string, configurator descendants, bool, 
+	//   pair, various STL containers, and primatives
 
 	/// cfgSetFromStream for strings.  
 	/// by default, operator>> will only read one word at a time
-	/// this one will read until a delimiter: ,#}]\t\r\n
+	/// this instead will read until a delimiter: ,#}]\t\r\n
 	static void cfgSetFromStream(std::istream& ss, std::string& str, const std::string& subVar="");
 
 	/// cfgSetFromStream for Configurator descendants
@@ -105,7 +106,7 @@ protected:
 	/// cfgSetFromStream for bool (allows (t,true,1,f,false,0))
 	static void cfgSetFromStream(std::istream& ss, bool& b, const std::string& subVar="");
 
-	/// helper function
+	/// helper function for cfgSetFromStream for pairs
 	/// workaround: a map's value_type is pair<const T1, T2> this casts off the const
 	template <typename T>
 	static T& remove_const(const T& val){
@@ -113,6 +114,8 @@ protected:
 	}
 
 	/// cfgSetFromStream for std::pair
+	/// element pair separated by whitespace or comma
+	/// note: string elements may contain spaces
 	template <typename T1, typename T2>
 	static void cfgSetFromStream(std::istream& is, std::pair<T1,T2>& pair, const std::string& subVar=""){
 		cfgSetFromStream(is, remove_const(pair.first), subVar);
@@ -125,20 +128,20 @@ protected:
 		cfgSetFromStream(is, pair.second, subVar);
 	}
 
-	/// cfgSetFromStream helper for any iterators
+	/// cfgSetFromStream helper for many STL containers
 	/// Parses container from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
 	template <typename Container>
 	static void cfgContainerSetFromStream(std::istream& is, Container& container, const std::string& subVar="");
 
 	/// cfgSetFromStream for vectors
-	/// Parses vector from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
+	/// wrapper for cfgContainerSetFromStream
 	template <typename T>
 	static void cfgSetFromStream(std::istream& is, std::vector<T>& vec, const std::string& subVar=""){
 		cfgContainerSetFromStream(is, vec, subVar);
 	}
 
 	/// cfgSetFromStream for sets
-	/// Parses sets from stream of format: "[1 2 3 4 5]" (commas required for strings, optional for others)
+	/// wrapper for cfgContainerSetFromStream
 	template <typename T>
 	static void cfgSetFromStream(std::istream& is, std::set<T>& set, const std::string& subVar=""){
 		cfgContainerSetFromStream(is, set, subVar);
@@ -146,7 +149,7 @@ protected:
 
 	/// cfgSetFromStream for map 
 	/// Parses map from stream of format: "[key1, val1, key2, val2]" 
-	/// (commas required for strings, optional for others)
+	/// wrapper for cfgContainerSetFromStream
 	template <typename T1, typename T2>
 	static void cfgSetFromStream(std::istream& is, std::map<T1,T2>& map, const std::string& subVar=""){
 		cfgContainerSetFromStream(is, map, subVar);
@@ -169,16 +172,17 @@ protected:
 	// cfgWriteToStreamHelper(stream, val, indent)
 	// Used internally by cfgMultiFunction
 	// Writes the contents of val to the stream
-	// Three definitions below: Configurator, vector, and other
+	// Overloaded for multiple types: string, configurator descendants, bool, 
+	//   pair, various STL containers, and primatives
+
+	/// cfgWriteToStreamHelper for string 
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent);
 
 	/// cfgWriteToStreamHelper for descendants of Configurator
 	static void cfgWriteToStreamHelper(std::ostream& stream, Configurator& cfg, int indent);
 
 	/// cfgWriteToStreamHelper for bool (writes true/false)
 	static void cfgWriteToStreamHelper(std::ostream& stream, bool& b, int indent);
-
-	/// cfgWriteToStreamHelper for string 
-	static void cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent);
 
 	/// cfgWriteToStreamHelper for std::pair
 	template <typename T1, typename T2>
@@ -289,8 +293,21 @@ void Configurator::cfgContainerSetFromStream(std::istream& is, Container& contai
 	}
 	std::string line;
 	container.clear();
-	// find first element
-	while(isspace(is.peek())||is.peek()=='[') is.ignore();
+	
+	// find next non-space
+	while(isspace(is.peek())) is.ignore();
+	
+	// make sure '['
+	char c = is.get();
+	if(c!='['){ // if c is not '[' set failbit in stream
+		is.setstate(std::ios::failbit); 
+		return;
+	}
+
+	// find next non-space
+	while(isspace(is.peek())) is.ignore();
+
+	// parse each element
 	while(is.good()){
 		// check for each of vector
 		if(is.peek()==']'){
