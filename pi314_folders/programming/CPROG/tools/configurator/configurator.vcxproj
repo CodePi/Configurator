@@ -75,6 +75,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="configurator.h" />
+    <ClInclude Include="Optional.h" />
     <ClInclude Include="TestConfig.h" />
     <ClInclude Include="type_traits_helper.h" />
   </ItemGroup>

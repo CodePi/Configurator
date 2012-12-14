@@ -9,6 +9,8 @@ int main(){
 	try{
 		tc.readString("s.i=999");
 
+		tc.opt1 = 1;
+
 		tc.jjj=6;
 
 		tc.set("jjj","8");

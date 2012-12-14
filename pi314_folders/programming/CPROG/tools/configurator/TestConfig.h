@@ -34,6 +34,7 @@ struct TestConfig:public Configurator{
 	std::vector<std::string> strList;
 	SubConfig1 u;
 	bool b;
+	Optional<int> opt1, opt2, opt3;
 
 	CFG_HEADER(TestConfig)
 	CFG_ENTRY2(jjj,12)
@@ -48,5 +49,8 @@ struct TestConfig:public Configurator{
 	CFG_ENTRY1(strList)
 	CFG_ENTRY1(u)
 	CFG_ENTRY1(b)
+	CFG_ENTRY1(opt1)
+	CFG_ENTRY1(opt2)
+	CFG_ENTRY1(opt3)
 	CFG_TAIL
 };

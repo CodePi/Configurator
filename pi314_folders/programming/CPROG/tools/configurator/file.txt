@@ -12,3 +12,4 @@ t=[{ i=1 j=2 k=3 }
 strList=[str1,str2, str3 more, str4\#escape , str5\,more ]
 u.include=file2.txt
 b=true
+opt2=123
