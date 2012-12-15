@@ -84,7 +84,7 @@ protected:
 	/// return i*2 spaces, for printing
 	static std::string cfgIndentBy(int i);
 	/// returns default value of type T
-	template <typename T> static T cfgGetDefaultVal(const T&var){ return T();}
+	template <typename T> static T cfgGetDefaultVal(const T&var){return T();}
 	/// overridable method called on parse error
 	virtual void throwError(std::string error){ throw std::runtime_error(error); }
 
