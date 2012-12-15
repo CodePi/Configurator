@@ -73,7 +73,7 @@ public:
   Optional<T>& operator=(const Optional<T>& rhs){
     if(this == &rhs) ;             // if self assignment, do nothing
     else if(!rhs.isSet()) unset(); // if rhs empty, empty lhs
-    else *this = (const T&)rhs;    // else copy contents (call T assignment operator)
+    else *this = *rhs.mpVal;    // else copy contents (call T assignment operator)
     return *this;
   }
 
