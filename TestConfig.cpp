@@ -36,7 +36,7 @@ int main(){
 		tc.map["goodbye"] = 987;
 
 		tc.pair = make_pair(123, "test test");
-		tc.pair2 = make_pair("test2 test", 1.1);
+		tc.pair2 = make_pair("test2 test", 1.1f);
 
 		tc.writeToStream(cout);
 
