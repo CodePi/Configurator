@@ -230,7 +230,7 @@ protected:
 	template <typename T>
 	static void cfgWriteToStreamHelper(std::ostream& stream, Optional<T>& opt, int indent){
 		// shouldn't be able to get this far if not set
-		if(!opt.isSet()) throw runtime_error("cfgWriteToStreamHelper Optional<T>: this shouldn't happen");
+		if(!opt.isSet()) throw std::runtime_error("cfgWriteToStreamHelper Optional<T>: this shouldn't happen");
 		cfgWriteToStreamHelper(stream, (T&)opt, indent);
 	}
 
