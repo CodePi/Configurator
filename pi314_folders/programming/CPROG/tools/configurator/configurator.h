@@ -303,12 +303,13 @@ protected:
 
 	/// returns true if optional type and value is set
 	template<typename T>
-	static bool isSetOrNotOptional(Optional<T>& opt){
+	static bool cfgIsSetOrNotOptional(Optional<T>& opt){
 		return opt.isSet();
 	}
 
 	/// returns true if not instance of Optional<T>
-	static bool isSetOrNotOptional(...){
+	template<typename T>
+	static bool cfgIsSetOrNotOptional(T& t){
 		return true;
 	}
 
@@ -393,10 +394,10 @@ void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Contain
 // continues cfgMultiFunction method, called for each member variable in struct 
 #define CFG_ENTRY2(varName, defaultVal) \
 	if(mfType==CFG_INIT_ALL) { \
-		if(isSetOrNotOptional(varName)) {varName = defaultVal;retVal++;} \
+		if(cfgIsSetOrNotOptional(varName)) {varName = defaultVal;retVal++;} \
     } else if(mfType==CFG_SET && #varName==*str) { cfgSetFromStream(*streamIn,varName,*subVar);retVal++;} \
 	else if(mfType==CFG_WRITE_ALL) { \
-		if(isSetOrNotOptional(varName)) { \
+		if(cfgIsSetOrNotOptional(varName)) { \
 			*streamOut<<cfgIndentBy(indent)<<#varName<<"="; \
 			cfgWriteToStreamHelper(*streamOut,varName,indent); \
 			*streamOut<<std::endl;retVal++; \

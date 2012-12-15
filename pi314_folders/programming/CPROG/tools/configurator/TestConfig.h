@@ -35,7 +35,7 @@ struct TestConfig:public Configurator{
 	SubConfig1 u;
 	bool b;
 	Optional<int> opt1, opt2, opt3;
-	Optional<vector<int>> optvec;
+	Optional< vector<int> > optvec;
 
 	CFG_HEADER(TestConfig)
 	CFG_ENTRY2(jjj,12)
