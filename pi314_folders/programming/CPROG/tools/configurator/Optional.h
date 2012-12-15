@@ -39,7 +39,7 @@ public:
   Optional(): mpVal(NULL){}
 
   // makes a copy of rhs.  
-  Optional(Optional<T>& rhs){
+  Optional(const Optional<T>& rhs){
     mpVal = NULL;
     *this = rhs; // call assignment operator
   }
@@ -48,7 +48,7 @@ public:
   ~Optional() { unset(); }
 
   // returns true if allocated
-  bool isSet() { return mpVal!=NULL; }
+  bool isSet() const { return mpVal!=NULL; }
 
   // sets to empty
   void unset(){
@@ -70,10 +70,10 @@ public:
   }
 
   // copies value.  Allocates if necessary
-  Optional<T>& operator=(Optional<T>& rhs){
+  Optional<T>& operator=(const Optional<T>& rhs){
     if(this == &rhs) ;             // if self assignment, do nothing
     else if(!rhs.isSet()) unset(); // if rhs empty, empty lhs
-    else *this = (T)rhs;           // else copy contents (call T assignment operator)
+    else *this = (const T&)rhs;    // else copy contents (call T assignment operator)
     return *this;
   }
 
