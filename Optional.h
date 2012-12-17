@@ -75,6 +75,12 @@ public:
     return *this;
   }
 
+  // allows access to instance methods and variables if payload is struct/class
+  T* operator->() {
+    T& me = (T&)*this;
+    return &me;
+  }
+
 private:
   T* mpVal;   // payload
 };
