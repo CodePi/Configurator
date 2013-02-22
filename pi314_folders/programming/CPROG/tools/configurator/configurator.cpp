@@ -51,8 +51,8 @@ public:
 // stripSpaces: Helper function
 
 static string stripSpaces(const string& in){
-	int a=in.find_first_not_of(" \t\r\n"); //find first non-space
-	int b=in.find_last_not_of(" \t\r\n"); //find last non-space
+	size_t a=in.find_first_not_of(" \t\r\n"); //find first non-space
+	size_t b=in.find_last_not_of(" \t\r\n"); //find last non-space
 	if(a==string::npos) return ""; //all white spaces
 	return in.substr(a,b-a+1); //get rid of leading or trailing spaces
 }
@@ -167,7 +167,7 @@ void Configurator::set(const std::string& varName, std::istream& stream){
 	}else{ // set varName from contents of stream
 		// Check for '.' separated format, e.g. "a.b.c=1"
 		// If so, strip off baseVar (a) from subVar (b.c)
-		int pos=varName.find_first_of('.');
+		size_t pos=varName.find_first_of('.');
 		string baseVar = stripSpaces(varName.substr(0,pos));  //first var: e.g. "a"
 		string subVar;
 		if(pos!=string::npos) subVar = varName.substr(pos+1); //subsequent vars: e.g. "b.c"
