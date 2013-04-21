@@ -298,9 +298,6 @@ protected:
 		return cfgCompareHelper((T&)a,(T&)b);
 	}
 
-	/// Used by TTHelper::is_configurator to identify decendents of Configurator
-	typedef void is_configurator;
-
 	/// returns true if optional type and value is set
 	template<typename T>
 	static bool cfgIsSetOrNotOptional(Optional<T>& opt){
@@ -313,6 +310,9 @@ protected:
 		return true;
 	}
 
+public:  // needs to be public for certain versions of gcc
+	/// Used by TTHelper::is_configurator to identify decendents of Configurator
+	typedef void is_configurator;
 };
 
 //////////////////////////////////////////////////////////////////
