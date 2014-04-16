@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="TestConfig.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Configurator\configurator.cpp">
+      <Filter>Configurator</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestConfig.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Configurator\configurator.h">
+      <Filter>Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Configurator\Optional.h">
+      <Filter>Configurator</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="file.txt">
+      <Filter>Test</Filter>
+    </None>
+    <None Include="file2.txt">
+      <Filter>Test</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Test">
+      <UniqueIdentifier>{6d90fbba-382e-409d-8652-d8076aab47aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Configurator">
+      <UniqueIdentifier>{a642116d-a9ca-44b9-9970-ae5897757d84}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
