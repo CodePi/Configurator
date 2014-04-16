@@ -1,6 +1,6 @@
 #pragma once
 
-#include "configurator.h"
+#include "../Configurator/configurator.h"
 
 struct SubConfig2:public Configurator{
 	int k;
