@@ -137,7 +137,6 @@
   <ItemGroup>
     <ClInclude Include="..\Configurator\configurator.h" />
     <ClInclude Include="..\Configurator\Optional.h" />
-    <ClInclude Include="..\Configurator\type_traits_helper.h" />
     <ClInclude Include="TestConfig.h" />
   </ItemGroup>
   <ItemGroup>

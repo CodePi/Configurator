@@ -30,8 +30,8 @@
 #include <stdexcept>
 #include <iomanip>
 #include <iterator>
+#include <type_traits>
 
-#include "type_traits_helper.h"
 #include "Optional.h"
 
 #ifdef _MSC_VER // if Visual Studio
@@ -166,7 +166,7 @@ protected:
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
-	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
+	static typename std::enable_if<!std::is_base_of<Configurator,T>::value,void>::type
 		cfgSetFromStream(std::istream& ss,  T& val, const std::string& subVar=""){
 			if(!subVar.empty()) { //subVar should be empty
 				ss.setstate(std::ios::failbit); //set fail bit to trigger error handling
@@ -238,7 +238,7 @@ protected:
 	/// the enable_if is required to prevent it from matching on Configurator descendants
 	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
-	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,void>::type
+	static typename std::enable_if<!std::is_base_of<Configurator,T>::value,void>::type
 		cfgWriteToStreamHelper(std::ostream& stream, T& val, int indent){
 			stream<<val;
 	}
@@ -271,7 +271,7 @@ protected:
 	
 	/// cfgCompareHelper for any type with defined operator==
 	template <typename T>
-	static typename TTHelper::enable_if<!TTHelper::is_configurator<T>::value,int>::type
+	static typename std::enable_if<!std::is_base_of<Configurator,T>::value,int>::type
 		cfgCompareHelper(T& a, T& b){
 			return !(a==b);
 	}
