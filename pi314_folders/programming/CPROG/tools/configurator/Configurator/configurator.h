@@ -15,9 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 // DEALINGS IN THE SOFTWARE.
 // 
-// Tested with gcc 4.1, gcc 4.3, vs2005, vs2010.
-// NOTE: On Windows, recommend compiling with /we4002 compile flag.  
-//       This will catch "incorrect number of args in macro" errors.
+// Tested with gcc 4.1, gcc 4.3, vs2010.
 
 #pragma once
 
@@ -25,6 +23,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <array>
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
@@ -48,14 +47,14 @@ public:
 	void readFile(const std::string& filename);
 	void readStream(std::istream& stream);
 	void readString(const std::string& str);
-	void readString(const char* str, int size);
+	void readString(const char* str, size_t size);
 	void readString(const char* str);
 
 	/// write contents of struct to file / stream / string
 	void writeToFile(const std::string& filename);
 	void writeToStream(std::ostream& stream,int indent=0);
 	void writeToString(std::string& str);
-	int  writeToString(char* str, int maxSize); //returns bytes used
+	size_t writeToString(char* str, size_t maxSize); //returns bytes used
 	std::string toString();
 
 	/// equality
@@ -141,6 +140,13 @@ protected:
 		cfgContainerSetFromStream(is, vec, subVar);
 	}
 
+	/// cfgSetFromStream for stl array
+	/// wrapper for cfgContainerSetFromStream
+	template <typename T, size_t N>
+	static void cfgSetFromStream(std::istream& is, std::array<T,N>& arr, const std::string& subVar=""){
+		cfgContainerSetFromStream(is, arr, subVar);
+	}
+
 	/// cfgSetFromStream for sets
 	/// wrapper for cfgContainerSetFromStream
 	template <typename T>
@@ -164,7 +170,6 @@ protected:
 
 	/// cfgSetFromStream for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
-	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename std::enable_if<!std::is_base_of<Configurator,T>::value,void>::type
 		cfgSetFromStream(std::istream& ss,  T& val, const std::string& subVar=""){
@@ -211,6 +216,13 @@ protected:
 		cfgContainerWriteToStreamHelper(stream, vec, indent);
 	}
 
+	/// cfgWriteToStreamHelper for stl array
+	/// Prints array to stream in format: "[1,2,3,4,5]"
+	template <typename T, size_t N>
+	static void cfgWriteToStreamHelper(std::ostream& stream, std::array<T,N>& vec, int indent){
+		cfgContainerWriteToStreamHelper(stream, vec, indent);
+	}
+
 	/// cfgWriteToStreamHelper for sets
 	/// Prints set to stream in format: "[1,2,3,4,5]"
 	template <typename T>
@@ -236,7 +248,6 @@ protected:
 
 	/// cfgWriteToStreamHelper for all other types
 	/// the enable_if is required to prevent it from matching on Configurator descendants
-	/// note: this is defined inline because vs2005 has trouble compiling otherwise
 	template <typename T>
 	static typename std::enable_if<!std::is_base_of<Configurator,T>::value,void>::type
 		cfgWriteToStreamHelper(std::ostream& stream, T& val, int indent){
@@ -281,6 +292,11 @@ protected:
 		return cfgContainerCompareHelper(a,b);
 	}
 
+	template <typename T, size_t N>
+	static int cfgCompareHelper(std::array<T,N>& a, std::array<T,N>& b){
+		return cfgContainerCompareHelper(a,b);
+	}
+
 	template <typename T>
 	static int cfgCompareHelper(std::set<T>& a, std::set<T>& b){
 		return cfgContainerCompareHelper(a,b);
@@ -310,6 +326,36 @@ protected:
 		return true;
 	}
 
+	//////////////////////////////
+	// Helper function to distinguish between stl arrays and other containers
+
+	// clear array by filling it with default values
+	template<typename T, size_t N>
+	static void clear_helper(std::array<T,N>& arr){
+		arr.fill(T());
+	}
+
+	// clear container
+	template<typename Container>
+	static void clear_helper(Container& container){
+		container.clear();
+	}
+
+	// inserting into array by index
+	template<typename T, size_t N>
+	static void insert_helper(std::array<T,N>& arr, size_t i, T& val){
+		if(i>=N) throw std::range_error("insert exceeds array size");
+		arr[i] = val;
+	}
+
+	// inserting into end of container (ignoring index, but should match anyway)
+	template<typename Container, typename T>
+	static void insert_helper(Container& container, size_t i, T& val){
+		assert(container.size()==i); 
+		container.insert(container.end(),val);
+	}
+
+
 public:  // needs to be public for certain versions of gcc
 	/// Used by TTHelper::is_configurator to identify decendents of Configurator
 	typedef void is_configurator;
@@ -327,7 +373,7 @@ void Configurator::cfgContainerSetFromStream(std::istream& is, Container& contai
 		return;
 	}
 	std::string line;
-	container.clear();
+	clear_helper(container);
 	
 	// find next non-space
 	while(isspace(is.peek())) is.ignore();
@@ -343,6 +389,7 @@ void Configurator::cfgContainerSetFromStream(std::istream& is, Container& contai
 	while(isspace(is.peek())) is.ignore();
 
 	// parse each element
+	size_t index=0;
 	while(is.good()){
 		// check for each of vector
 		if(is.peek()==']'){
@@ -353,7 +400,12 @@ void Configurator::cfgContainerSetFromStream(std::istream& is, Container& contai
 		// read element and add to vector
 		typename Container::value_type val;
 		cfgSetFromStream(is,val);
-		if(is) container.insert(container.end(),val);
+		try{
+			if(is) insert_helper(container, index, val);
+		}catch(std::range_error&){
+			is.setstate(std::ios::failbit);  // exceeded container size
+			return;
+		}
 
 		// push to next element, removing comments
 		while(isspace(is.peek())||is.peek()==','||is.peek()=='#') {
@@ -361,6 +413,8 @@ void Configurator::cfgContainerSetFromStream(std::istream& is, Container& contai
 			if(is.peek()=='#') getline(is,dumpStr);
 			else is.ignore();
 		}
+
+		index++;
 	}
 }
 

@@ -15,9 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 // DEALINGS IN THE SOFTWARE.
 // 
-// Tested with gcc 4.1, gcc 4.3, vs2005, vs2010.
-// NOTE: On Windows, recommend compiling with /we4002 compile flag.  
-//       This will catch "incorrect number of args in macro" errors.
+// Tested with gcc 4.1, gcc 4.3, vs2010.
 
 #include "configurator.h"
 #include <fstream>
@@ -99,7 +97,7 @@ void Configurator::readString(const string& str){
 	readString(str.c_str(), str.size());
 }
 
-void Configurator::readString(const char* str, int size){
+void Configurator::readString(const char* str, size_t size){
 	// use str as custom buffer in istream without copying
 	StreambufWrapper sb((char*)str, size);  
 	istream is(&sb);                        
@@ -129,12 +127,12 @@ void Configurator::writeToString(string& str){
 	str = ss.str();
 }
 
-int Configurator::writeToString(char* str, int maxSize){
+size_t Configurator::writeToString(char* str, size_t maxSize){
 	// use str as custom buffer in ostream without copying
 	StreambufWrapper sb(str, maxSize);
 	ostream os(&sb);
 	writeToStream(os);
-	int size = sb.getSizeUsed();
+	size_t size = sb.getSizeUsed();
 	if(size<maxSize) str[size]='\0'; // terminate with \0 if space
 	return size;
 }

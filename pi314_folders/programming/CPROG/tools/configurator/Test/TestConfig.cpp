@@ -46,7 +46,7 @@ int main(){
 
 		static const int STRSIZE = 1000;
 		char str2[STRSIZE];
-		int size = tc.writeToString(str2,STRSIZE);
+		size_t size = tc.writeToString(str2,STRSIZE);
 		tc3.readString(str2, size);
 		if(tc!=tc3) throw runtime_error("Error: tc!=tc3");
 
