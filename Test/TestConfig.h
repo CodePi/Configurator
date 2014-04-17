@@ -24,6 +24,7 @@ struct TestConfig:public Configurator{
 
 	int jjj;
 	std::vector<int> k;
+	std::array<int,10> arr;
 	std::set<int> intSet;
 	std::pair<int, std::string> pair;
 	std::pair<std::string, float> pair2;
@@ -40,6 +41,7 @@ struct TestConfig:public Configurator{
 	CFG_HEADER(TestConfig)
 	CFG_ENTRY2(jjj,12)
 	CFG_ENTRY1(k)
+	CFG_ENTRY1(arr)
 	CFG_ENTRY1(intSet)
 	CFG_ENTRY1(pair)
 	CFG_ENTRY1(pair2)

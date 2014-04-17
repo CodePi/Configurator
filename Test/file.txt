@@ -1,5 +1,6 @@
 jjj=22  
 k=[1, 2, 3, 4, 5]
+arr = [9,8,7,6,5,4,3,2,1,0]
 n=test 123 #test comment 1
 s={
 	i=8  #test comment 2
