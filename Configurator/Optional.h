@@ -41,6 +41,24 @@ public:
     mpVal = NULL;
     *this = rhs; // call assignment operator
   }
+  
+  // initialize value  
+  Optional(const T& rhs){
+    mpVal = NULL;
+    *this = rhs; // call assignment operator
+  }
+
+  // construct by move  
+  Optional(Optional<T>&& rhs){
+    mpVal = NULL;
+    *this = move(rhs); // call move assignment operator
+  }
+  
+  // construct by move  
+  Optional(T&& rhs){
+    mpVal = NULL;
+    *this = move(rhs); // call move assignment operator
+  }
 
   // deallocates if necessary
   ~Optional() { unset(); }
@@ -72,6 +90,24 @@ public:
     if(this == &rhs) ;             // if self assignment, do nothing
     else if(!rhs.isSet()) unset(); // if rhs empty, empty lhs
     else *this = *rhs.mpVal;    // else copy contents (call T assignment operator)
+    return *this;
+  }
+
+  // assigns value.  Allocates if necessary
+  Optional<T>& operator=(T&& rhs){
+    if(!mpVal) mpVal = new T;
+    *mpVal = move(rhs);
+	return *this;
+  }
+
+  // moves value. 
+  Optional<T>& operator=(Optional<T>&& rhs){
+    if(this == &rhs) ;             // if self assignment, do nothing
+    else {
+		unset();               // unset current value
+		mpVal = rhs.mpVal;     // move from rhs to lhs
+		rhs.mpVal = NULL;      // clear rhs
+	}
     return *this;
   }
 
