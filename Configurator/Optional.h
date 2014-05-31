@@ -51,13 +51,13 @@ public:
   // construct by move  
   Optional(Optional<T>&& rhs){
     mpVal = NULL;
-    *this = move(rhs); // call move assignment operator
+    *this = std::move(rhs); // call move assignment operator
   }
   
   // construct by move  
   Optional(T&& rhs){
     mpVal = NULL;
-    *this = move(rhs); // call move assignment operator
+    *this = std::move(rhs); // call move assignment operator
   }
 
   // deallocates if necessary
@@ -96,7 +96,7 @@ public:
   // assigns value.  Allocates if necessary
   Optional<T>& operator=(T&& rhs){
     if(!mpVal) mpVal = new T;
-    *mpVal = move(rhs);
+    *mpVal = std::move(rhs);
 	return *this;
   }
 
