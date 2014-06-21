@@ -62,9 +62,25 @@ int main(){
   
   // test8
   const vector<int> v8 = {1,2,3};
-  Optional<vector<int>> ov8(v8);
   orig = (int*)v8.data();
+  Optional<vector<int>> ov8(v8);
   curr = ov8->data();
   printf("construct by const:\t\t%x\t%x\t%s\n", orig, curr, pf(orig!=curr));
+
+  // test9 
+  vector<int> v9 = {1,2,3};
+  Optional<vector<int>> ov9;
+  orig = v9.data();
+  ov9 = v9;
+  curr = ov9->data();
+  printf("assignment by copy:\t\t%x\t%x\t%s\n", orig, curr, pf(orig!=curr));
+  
+  // test10 
+  Optional<vector<int>> v10(vector<int>({1,2,3}));
+  Optional<vector<int>> ov10;
+  orig = v10->data();
+  ov10 = v10;
+  curr = ov10->data();
+  printf("assignment by copy wrapper:\t%x\t%x\t%s\n", orig, curr, pf(orig!=curr));
 
 }
