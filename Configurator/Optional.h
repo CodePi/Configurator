@@ -37,29 +37,12 @@ public:
   Optional(): mpVal(NULL){}
 
   // makes a copy of rhs.  
-  Optional(const Optional<T>& rhs){
+  template <typename U>
+  Optional(U&& rhs){
     mpVal = NULL;
-    *this = rhs; // call assignment operator
+    *this = std::forward<U>(rhs); // call assignment operator
   }
   
-  // initialize value  
-  Optional(const T& rhs){
-    mpVal = NULL;
-    *this = rhs; // call assignment operator
-  }
-
-  // construct by move  
-  Optional(Optional<T>&& rhs){
-    mpVal = NULL;
-    *this = std::move(rhs); // call move assignment operator
-  }
-  
-  // construct by move  
-  Optional(T&& rhs){
-    mpVal = NULL;
-    *this = std::move(rhs); // call move assignment operator
-  }
-
   // deallocates if necessary
   ~Optional() { unset(); }
 
