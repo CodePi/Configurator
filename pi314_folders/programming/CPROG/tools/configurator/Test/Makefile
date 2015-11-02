@@ -8,3 +8,6 @@ TestConfig2: TestConfig2.cpp ../Configurator/configurator.cpp ../Configurator/co
 
 testOptional: testOptional.cpp ../Configurator/Optional.h
 	g++ testOptional.cpp -std=c++0x -o testOptional
+
+clean:
+	rm TestConfig TestConfig2 testOptional
