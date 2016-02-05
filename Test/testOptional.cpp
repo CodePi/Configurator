@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 using namespace std;
+using namespace codepi;
 
 vector<int> rvalue(int**p){
   vector<int> v = {1,2,3};

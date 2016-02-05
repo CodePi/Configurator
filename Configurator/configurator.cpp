@@ -29,6 +29,8 @@
 
 using namespace std;
 
+namespace codepi {
+
 //////////////////////////////////////////////////////////////////////
 // StreambufWrapper: Helper class for wrapping a char* without copying
 // This allows use of a c-style array as a streambuf
@@ -273,3 +275,5 @@ void Configurator::cfgWriteToStreamHelper(std::ostream& stream, std::string& str
 int Configurator::cfgCompareHelper(Configurator& a, Configurator& b){
 	return a.cfgMultiFunction(CFG_COMPARE, NULL,NULL,NULL,NULL,0,&b);
 }
+
+} //end namespace codepi

@@ -2,6 +2,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace codepi;
 
 int main(){
 	TestConfig tc, tc2, tc3;

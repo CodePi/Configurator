@@ -30,6 +30,8 @@
 
 #include <iostream>
 
+namespace codepi {
+
 template <typename T>
 class Optional{
 public:
@@ -104,3 +106,4 @@ private:
   T* mpVal;   // payload
 };
 
+} // end namespace codepi

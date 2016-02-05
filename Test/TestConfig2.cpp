@@ -2,6 +2,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace codepi;
 
 struct Struct{
   int a,b,c;

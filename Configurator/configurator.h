@@ -38,6 +38,8 @@
 #pragma warning( error : 4002 ) // treat macros with incorrect number of args as error
 #endif
 
+namespace codepi {
+
 //////////////////////////////////////////////////////////////////
 // Configurator - virtual base class
 
@@ -475,3 +477,5 @@ void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Contain
 
 // closes out cfgMultiFunction method
 #define CFG_TAIL return retVal; }
+
+} //end namespace codepi

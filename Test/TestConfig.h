@@ -2,7 +2,7 @@
 
 #include "../Configurator/configurator.h"
 
-struct SubConfig2:public Configurator{
+struct SubConfig2:public codepi::Configurator{
 	int k;
 
 	CFG_HEADER(SubConfig2)
@@ -20,7 +20,7 @@ struct SubConfig1:public SubConfig2{
 	CFG_TAIL
 };
 
-struct TestConfig:public Configurator{
+struct TestConfig:public codepi::Configurator{
 
 	int jjj;
 	std::vector<int> k;
@@ -35,8 +35,8 @@ struct TestConfig:public Configurator{
 	std::vector<std::string> strList;
 	SubConfig1 u;
 	bool b;
-	Optional<int> opt1, opt2, opt3;
-	Optional< std::vector<int> > optvec;
+	codepi::Optional<int> opt1, opt2, opt3;
+	codepi::Optional< std::vector<int> > optvec;
 
 	CFG_HEADER(TestConfig)
 	CFG_ENTRY2(jjj,12)
