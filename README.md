@@ -93,3 +93,4 @@ public:
 * All primitives
 * Most std containers: string, vector, set, map, array
 * Any type with a operator>>() and a compatible operator<<()
+* Nested supported types: vector of vector, vector of outfitted struct, etc...
