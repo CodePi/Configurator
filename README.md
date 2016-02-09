@@ -2,8 +2,6 @@
 Hierarchical C++ struct human readable serializer/deserializer
 
 ### Example usage
-
-#### Example config definition
 ``` cpp
 struct Config1 : public Configurator {
   int exampleIntValue;
@@ -91,3 +89,7 @@ public:
         virtual ~Configurator(){}
 };
 ```
+#### Supported types
+* All primatives
+* Most std containers: string, vector, set, map, array
+* Any type with a operator>>() and a compatible operator<<()
