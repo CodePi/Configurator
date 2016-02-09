@@ -91,6 +91,6 @@ public:
 ```
 #### Supported types
 * All primitives
-* Most std containers: string, vector, set, map, array
-* Any type with a operator>>() and a compatible operator<<()
+* Most std containers: string, vector, set, map, array, pair
 * Nested supported types: vector of vector, vector of outfitted struct, etc...
+* Any type with a operator>>() and a compatible operator<<()
