@@ -90,6 +90,6 @@ public:
 };
 ```
 #### Supported types
-* All primatives
+* All primitives
 * Most std containers: string, vector, set, map, array
 * Any type with a operator>>() and a compatible operator<<()
