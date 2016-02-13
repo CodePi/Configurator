@@ -1,5 +1,5 @@
 # Configurator
-Hierarchical C++ struct human readable serializer/deserializer
+Hierarchical C++ struct human readable serializer/deserializer.  Originally made for configuration file reading/writing.
 
 Compiles with C++11 compatible compilers. Tested with gcc 4.4 and Visual Studio 2012.
 
