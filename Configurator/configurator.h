@@ -358,10 +358,6 @@ protected:
 		container.insert(container.end(),val);
 	}
 
-
-public:  // needs to be public for certain versions of gcc
-	/// Used by TTHelper::is_configurator to identify decendents of Configurator
-	typedef void is_configurator;
 };
 
 //////////////////////////////////////////////////////////////////
