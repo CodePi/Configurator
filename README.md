@@ -63,32 +63,32 @@ anotherInt=2
 ``` cpp
 class Configurator{
 public:
-        /// read and parse file / stream / string
-        void readFile(const std::string& filename);
-        void readStream(std::istream& stream);
-        void readString(const std::string& str);
-        void readString(const char* str, size_t size);
-        void readString(const char* str);
+  /// read and parse file / stream / string
+  void readFile(const std::string& filename);
+  void readStream(std::istream& stream);
+  void readString(const std::string& str);
+  void readString(const char* str, size_t size);
+  void readString(const char* str);
 
-        /// write contents of struct to file / stream / string
-        void writeToFile(const std::string& filename);
-        void writeToStream(std::ostream& stream,int indent=0);
-        void writeToString(std::string& str);
-        size_t writeToString(char* str, size_t maxSize); //returns bytes used
-        std::string toString();
+  /// write contents of struct to file / stream / string
+  void writeToFile(const std::string& filename);
+  void writeToStream(std::ostream& stream,int indent=0);
+  void writeToString(std::string& str);
+  size_t writeToString(char* str, size_t maxSize); //returns bytes used
+  std::string toString();
 
-        /// equality
-        bool operator==(Configurator& other);
-        bool operator!=(Configurator& other);
+  /// equality
+  bool operator==(Configurator& other);
+  bool operator!=(Configurator& other);
 
-        /// set varname = val
-        void set(const std::string& varName, const std::string& val);
-        /// set varname based on contents of stream
-        void set(const std::string& varName, std::istream& stream);
-        /// return name of current struct
-        virtual std::string getStructName()=0;
-        ///virtualized destructor for proper inheritance
-        virtual ~Configurator(){}
+  /// set varname = val
+  void set(const std::string& varName, const std::string& val);
+  /// set varname based on contents of stream
+  void set(const std::string& varName, std::istream& stream);
+  /// return name of current struct
+  virtual std::string getStructName()=0;
+  ///virtualized destructor for proper inheritance
+  virtual ~Configurator(){}
 };
 ```
 #### Supported types

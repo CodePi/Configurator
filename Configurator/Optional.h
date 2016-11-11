@@ -67,7 +67,7 @@ public:
   Optional<T>& operator=(const T& rhs){
     if(!mpVal) mpVal = new T;
     *mpVal = rhs;
-	return *this;
+    return *this;
   }
 
   // copies value.  Allocates if necessary
@@ -82,28 +82,28 @@ public:
   Optional<T>& operator=(T&& rhs){
     if(!mpVal) mpVal = new T;
     *mpVal = std::move(rhs);
-	return *this;
+    return *this;
   }
 
   // moves value. 
   Optional<T>& operator=(Optional<T>&& rhs){
     if(this == &rhs) ;             // if self assignment, do nothing
     else {
-		unset();               // unset current value
-		mpVal = rhs.mpVal;     // move from rhs to lhs
-		rhs.mpVal = NULL;      // clear rhs
-	}
+      unset();               // unset current value
+      mpVal = rhs.mpVal;     // move from rhs to lhs
+      rhs.mpVal = NULL;      // clear rhs
+    }
     return *this;
   }
-
+  
   // allows access to instance methods and variables if payload is struct/class
   T* operator->() {
     T& me = (T&)*this;
     return &me;
   }
-
+  
 private:
   T* mpVal;   // payload
-};
-
+ };
+ 
 } // end namespace codepi
