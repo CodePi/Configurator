@@ -2,11 +2,9 @@ CC=g++
 FLAGS=-std=c++0x
 TARGETS := TestConfig TestConfig2 TestConfig3 testOptional
 
-TARGETS := $(patsubst %,$(TAG)%,$(TARGETS))
-
 all : $(TARGETS)
 
-$(TAG)% : %.cpp ../Configurator/configurator.h ../Configurator/Optional.h ../Configurator/configurator.cpp TestConfig.h
+% : %.cpp ../Configurator/configurator.h ../Configurator/Optional.h ../Configurator/configurator.cpp TestConfig.h
 	$(CC) $< -o $@ $(FLAGS) ../Configurator/configurator.cpp
 
 clean:
