@@ -2,15 +2,19 @@
 
 set -e
 
+TAG="$1"
+
+echo $TAG
+
 echo --------------------------
-echo TestConfig
-./TestConfig
+echo ${TAG}TestConfig
+./${TAG}TestConfig
 echo --------------------------
-echo TestConfig2
-./TestConfig2
+echo ${TAG}TestConfig2
+./${TAG}TestConfig2
 echo --------------------------
-echo TestConfig3
-./TestConfig3
+echo ${TAG}TestConfig3
+./${TAG}TestConfig3
 echo --------------------------
-echo testOptional
-./testOptional
+echo ${TAG}testOptional
+./${TAG}testOptional
