@@ -4,8 +4,6 @@ set -e
 
 TAG="$1"
 
-echo $TAG
-
 echo --------------------------
 echo ${TAG}TestConfig
 ./${TAG}TestConfig
