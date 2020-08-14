@@ -96,7 +96,7 @@ protected:
   // Sets value of val based on contents of stream
   // subVar is for '.' separated nested structs, e.g. "a.b=5"
   // Overloaded for multiple types: string, configurator descendants, bool, 
-  //   pair, various STL containers, and primatives
+  //   pair, various STL containers, and primitives
 
   /// cfgSetFromStream for strings.  
   /// by default, operator>> will only read one word at a time
@@ -188,7 +188,7 @@ protected:
   // Used internally by cfgMultiFunction
   // Writes the contents of val to the stream
   // Overloaded for multiple types: string, configurator descendants, bool, 
-  //   pair, various STL containers, and primatives
+  //   pair, various STL containers, and primitives
 
   /// cfgWriteToStreamHelper for string 
   static void cfgWriteToStreamHelper(std::ostream& stream, std::string& str, int indent);
