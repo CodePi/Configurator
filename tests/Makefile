@@ -1,18 +1,11 @@
-all: TestConfig TestConfig2 TestConfig3 testOptional
-
 CC=g++
+FLAGS=-std=c++0x
+TARGETS := TestConfig TestConfig2 TestConfig3 testOptional
 
-TestConfig: TestConfig.cpp ../Configurator/configurator.cpp ../Configurator/configurator.h ../Configurator/Optional.h
-	$(CC) TestConfig.cpp ../Configurator/configurator.cpp -std=c++0x -o TestConfig
+all : $(TARGETS)
 
-TestConfig2: TestConfig2.cpp ../Configurator/configurator.cpp ../Configurator/configurator.h ../Configurator/Optional.h
-	$(CC) TestConfig2.cpp ../Configurator/configurator.cpp -std=c++0x -o TestConfig2
-
-TestConfig3: TestConfig3.cpp ../Configurator/configurator.cpp ../Configurator/configurator.h ../Configurator/Optional.h
-	$(CC) TestConfig3.cpp ../Configurator/configurator.cpp -std=c++0x -o TestConfig3
-
-testOptional: testOptional.cpp ../Configurator/Optional.h
-	$(CC) testOptional.cpp -std=c++0x -o testOptional
+% : %.cpp ../Configurator/configurator.h ../Configurator/Optional.h ../Configurator/configurator.cpp TestConfig.h
+	$(CC) $< -o $@ $(FLAGS) ../Configurator/configurator.cpp
 
 clean:
-	rm TestConfig TestConfig2 TestConfig3 testOptional
+	rm -f $(TARGETS)
