@@ -1,20 +1,24 @@
-#include "../Configurator/Optional.h"
+#include "../ConfiguratorJson/Optional.h"
 #include <vector>
 #include <stdio.h>
 
 using namespace std;
 using namespace codepi;
 
+bool g_all_pass = true;
+
 vector<int> rvalue(int**p){
   vector<int> v = {1,2,3};
   *p = v.data();
   return v;
-
 }
 
 const char* pf(bool test){
   if(test==true) return "pass";
-  else return "fail";
+  else {
+      g_all_pass = false;
+      return "fail";
+  }
 }
 
 int main(){
@@ -84,4 +88,15 @@ int main(){
   curr = ov10->data();
   printf("assignment by copy wrapper:\t%p\t%p\t%s\n", orig, curr, pf(orig!=curr));
 
+  // test11
+  const Optional<int> v11 = 5;
+  const int& v11i = v11;
+  printf("const ref test: %s\n", pf(v11==v11i));
+
+  if(!g_all_pass) {
+      printf("not all pass\n");
+      return -1;
+  }
+  printf("all pass\n");
+  return 0;
 }

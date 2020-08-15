@@ -29,6 +29,7 @@
 #pragma once
 
 #include <iostream>
+#include <stdexcept>
 
 namespace codepi {
 
@@ -57,10 +58,26 @@ public:
     mpVal = NULL;
   }
 
-  // returns reference.  Allocates if necessary
-  operator T&(){
+  // returns reference.  Allocates if necessary.
+  T& get(){
     if(!mpVal) mpVal = new T;
     return *mpVal;
+  }
+
+  // returns const reference.  Throws if empty.
+  const T& get() const {
+    if(mpVal == nullptr) throw std::runtime_error("taking ref of empty const Optional");
+    return *mpVal;
+  }
+
+  // returns reference.  Allocates if necessary.
+  operator T&(){
+    return get();
+  }
+
+  // returns const reference.  Throws if empty.
+  operator const T&() const {
+    return get();
   }
 
   // assigns value.  Allocates if necessary
