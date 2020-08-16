@@ -95,6 +95,11 @@ void Configurator::readStream(istream& stream){
   }
 }
 
+std::istream& operator>>(std::istream& is, Configurator& cfg){
+    cfg.readStream(is);
+    return is;
+}
+
 void Configurator::readString(const string& str){
   readString(str.c_str(), str.size());
 }
@@ -121,6 +126,11 @@ void Configurator::writeToStream(ostream& os,int indent){
   if(indent>0) os<<"{\n"; //print braces on nested structs only
   cfgMultiFunction(CFG_WRITE_ALL, NULL, NULL, NULL, &os, indent, NULL); 
   if(indent>0) os<<Configurator::cfgIndentBy(indent-1)<<"}";
+}
+
+std::ostream& operator<<(std::ostream& os, Configurator& cfg) {
+  cfg.writeToStream(os);
+  return os;
 }
 
 void Configurator::writeToString(string& str){

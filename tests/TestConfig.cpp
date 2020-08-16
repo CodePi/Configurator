@@ -39,7 +39,7 @@ int main(){
     tc.pair = make_pair(123, "test test");
     tc.pair2 = make_pair("test2 test", 1.1f);
 
-    tc.writeToStream(cout);
+    cout << tc;
 
     string str = tc.toString();
     tc2.readString(str);

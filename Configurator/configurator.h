@@ -52,6 +52,7 @@ public:
   void readString(const std::string& str);
   void readString(const char* str, size_t size);
   void readString(const char* str);
+  friend std::istream& operator>>(std::istream& is, Configurator& cfg);
 
   /// write contents of struct to file / stream / string
   void writeToFile(const std::string& filename);
@@ -59,6 +60,7 @@ public:
   void writeToString(std::string& str);
   size_t writeToString(char* str, size_t maxSize); //returns bytes used
   std::string toString();
+  friend std::ostream& operator<<(std::ostream& os, Configurator& cfg);
 
   /// equality
   bool operator==(Configurator& other);
