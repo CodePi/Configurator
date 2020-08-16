@@ -15,11 +15,11 @@ struct Config1 : public Configurator {
   map<string, int> exampleMap;
 
   CFG_HEADER(Config1)
-  CFG_ENTRY2(exampleIntValue, 12) 
-  CFG_ENTRY1(exampleFloat)
-  CFG_ENTRY2(exampleString, "initial value")
-  CFG_ENTRY1(exampleVector)
-  CFG_ENTRY1(exampleMap)
+  CFG_ENTRY_DEF(exampleIntValue, 12)
+  CFG_ENTRY(exampleFloat)
+  CFG_ENTRY_DEF(exampleString, "initial value")
+  CFG_ENTRY(exampleVector)
+  CFG_ENTRY(exampleMap)
   CFG_TAIL
 };
 
@@ -28,8 +28,8 @@ struct Config2 : public Configurator {
   int anotherInt;
 
   CFG_HEADER(Config2)
-  CFG_ENTRY1(exampleSub)
-  CFG_ENTRY1(anotherInt)
+  CFG_ENTRY(exampleSub)
+  CFG_ENTRY(anotherInt)
   CFG_TAIL
 };
 

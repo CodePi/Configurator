@@ -445,7 +445,7 @@ void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Contain
       if(!otherPtr) return 1; /*dynamic cast failed, types different*/ }
 
 // continues cfgMultiFunction method, called for each member variable in struct 
-#define CFG_ENTRY2(varName, defaultVal) \
+#define CFG_ENTRY_DEF(varName, defaultVal) \
   if(mfType==CFG_INIT_ALL) { \
     if(cfgIsSetOrNotOptional(varName)) {varName = defaultVal;retVal++;} \
     } else if(mfType==CFG_SET && #varName==*str) { cfgSetFromStream(*streamIn,varName,*subVar);retVal++;} \
@@ -461,15 +461,26 @@ void Configurator::cfgContainerWriteToStreamHelper(std::ostream& stream, Contain
     retVal+=cfgCompareHelper(this->varName,otherPtr->varName); \
   }
 
-// alternative to CFG_ENTRY2 used when default defaultVal is sufficient
-#define CFG_ENTRY1(varName) CFG_ENTRY2(varName, cfgGetDefaultVal(varName))
+// alternative to CFG_ENTRY_DEF used when default defaultVal is sufficient
+#define CFG_ENTRY(varName) CFG_ENTRY_DEF(varName, cfgGetDefaultVal(varName))
+
+// multientry
+#define CFG_MULTIENTRY1(v1)                              CFG_ENTRY(v1)
+#define CFG_MULTIENTRY2(v1,v2)                           CFG_ENTRY(v1) CFG_MULTIENTRY1(v2)
+#define CFG_MULTIENTRY3(v1,v2,v3)                        CFG_ENTRY(v1) CFG_MULTIENTRY2(v2,v3)
+#define CFG_MULTIENTRY4(v1,v2,v3,v4)                     CFG_ENTRY(v1) CFG_MULTIENTRY3(v2,v3,v4)
+#define CFG_MULTIENTRY5(v1,v2,v3,v4,v5)                  CFG_ENTRY(v1) CFG_MULTIENTRY4(v2,v3,v4,v5)
+#define CFG_MULTIENTRY6(v1,v2,v3,v4,v5,v6)               CFG_ENTRY(v1) CFG_MULTIENTRY5(v2,v3,v4,v5,v6)
+#define CFG_MULTIENTRY7(v1,v2,v3,v4,v5,v6,v7)            CFG_ENTRY(v1) CFG_MULTIENTRY6(v2,v3,v4,v5,v6,v7)
+#define CFG_MULTIENTRY8(v1,v2,v3,v4,v5,v6,v7,v8)         CFG_ENTRY(v1) CFG_MULTIENTRY7(v2,v3,v4,v5,v6,v7,v8)
+#define CFG_MULTIENTRY9(v1,v2,v3,v4,v5,v6,v7,v8,v9)      CFG_ENTRY(v1) CFG_MULTIENTRY8(v2,v3,v4,v5,v6,v7,v8,v9)
+#define CFG_MULTIENTRY10(v1,v2,v3,v4,v5,v6,v7,v8,v9,v10) CFG_ENTRY(v1) CFG_MULTIENTRY9(v2,v3,v4,v5,v6,v7,v8,v9,v10)
 
 // calls cfgMultiFunction method of parent
 // allows for inheritance
 #define CFG_PARENT(parentName) \
   int rc=parentName::cfgMultiFunction(mfType,str,subVar,streamIn,streamOut,indent,other); \
   retVal+=rc;
-  
 
 // closes out cfgMultiFunction method
 #define CFG_TAIL return retVal; }

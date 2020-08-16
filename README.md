@@ -11,13 +11,16 @@ struct Config1 : public Configurator {
   string exampleString;
   vector<int> exampleVector;
   map<string, int> exampleMap;
+  int i,j,k;
+  float x,y,z;
 
   CFG_HEADER(Config1)
-  CFG_ENTRY2(exampleIntValue, 12)
-  CFG_ENTRY1(exampleFloat)
-  CFG_ENTRY2(exampleString, "initial value")
-  CFG_ENTRY1(exampleVector)
-  CFG_ENTRY1(exampleMap)
+  CFG_ENTRY_DEF(exampleIntValue, 12)  // entry with explicit default value
+  CFG_ENTRY(exampleFloat)             // entry with auto default value for type
+  CFG_ENTRY_DEF(exampleString, "initial value")
+  CFG_ENTRY(exampleVector)
+  CFG_ENTRY(exampleMap)
+  CFG_MULTIENTRY6(i,j,k,x,y,z) // multiple entries with auto default value
   CFG_TAIL
 };
 
@@ -26,8 +29,8 @@ struct Config2 : public Configurator {
   int anotherInt;
 
   CFG_HEADER(Config2)
-  CFG_ENTRY1(exampleSub)
-  CFG_ENTRY1(anotherInt)
+  CFG_ENTRY(exampleSub)
+  CFG_ENTRY(anotherInt)
   CFG_TAIL
 };
 

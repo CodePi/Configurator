@@ -17,9 +17,9 @@ struct StructConfig :public Struct, public Configurator {
   }
 
   CFG_HEADER(StructConfig)
-  CFG_ENTRY1(a)
-  CFG_ENTRY1(b)
-  CFG_ENTRY1(c)
+  CFG_ENTRY(a)
+  CFG_ENTRY(b)
+  CFG_ENTRY(c)
   CFG_TAIL
 };
 
