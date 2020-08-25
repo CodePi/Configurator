@@ -82,7 +82,7 @@ public:
 
   // assigns value.  Allocates if necessary
   Optional<T>& operator=(const T& rhs){
-    get() = rhs;
+    if(mpVal!=&rhs) get() = rhs;
     return *this;
   }
 
@@ -90,20 +90,19 @@ public:
   Optional<T>& operator=(const Optional<T>& rhs){
     if(this == &rhs) ;             // if self assignment, do nothing
     else if(!rhs.isSet()) unset(); // if rhs empty, empty lhs
-    else *this = *rhs.mpVal;    // else copy contents (call T assignment operator)
+    else *this = *rhs.mpVal;       // else copy contents (call T assignment operator)
     return *this;
   }
 
   // assigns value.  Allocates if necessary
   Optional<T>& operator=(T&& rhs){
-    get() = std::move(rhs);
+    if(mpVal!=&rhs) get() = std::move(rhs);
     return *this;
   }
 
   // moves value. 
   Optional<T>& operator=(Optional<T>&& rhs){
-    if(this == &rhs) ;             // if self assignment, do nothing
-    else {
+    if(this != &rhs) {       // if self assignment, do nothing
       unset();               // unset current value
       mpVal = rhs.mpVal;     // move from rhs to lhs
       rhs.mpVal = NULL;      // clear rhs
@@ -112,14 +111,8 @@ public:
   }
 
   // allows access to instance methods and variables if payload is struct/class
-  T* operator->() {
-    return &get();
-  }
-
-  // allows access to instance methods and variables if payload is struct/class (const version)
-  const T* operator->() const {
-    return &get();
-  }
+  T* operator->() { return &get(); }
+  const T* operator->() const { return &get(); }
 
 private:
   T* mpVal;   // payload
