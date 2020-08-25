@@ -37,25 +37,24 @@ template <typename T>
 class Optional{
 public:
   // object starts empty
-  Optional(): mpVal(NULL){}
+  Optional() = default;
 
-  // makes a copy of rhs.  
+  // makes a copy of rhs.
   template <typename U>
   Optional(U&& rhs){
-    mpVal = NULL;
     *this = std::forward<U>(rhs); // call assignment operator
   }
-  
+
   // deallocates if necessary
   ~Optional() { unset(); }
 
   // returns true if allocated
-  bool isSet() const { return mpVal!=NULL; }
+  bool isSet() const { return mpVal!=nullptr; }
 
   // sets to empty
   void unset(){
     delete mpVal;
-    mpVal = NULL;
+    mpVal = nullptr;
   }
 
   // returns reference.  Allocates if necessary.
@@ -100,12 +99,12 @@ public:
     return *this;
   }
 
-  // moves value. 
+  // moves value.
   Optional<T>& operator=(Optional<T>&& rhs){
     if(this != &rhs) {       // if self assignment, do nothing
       unset();               // unset current value
       mpVal = rhs.mpVal;     // move from rhs to lhs
-      rhs.mpVal = NULL;      // clear rhs
+      rhs.mpVal = nullptr;      // clear rhs
     }
     return *this;
   }
@@ -115,7 +114,7 @@ public:
   const T* operator->() const { return &get(); }
 
 private:
-  T* mpVal;   // payload
+  T* mpVal = nullptr;   // payload
  };
- 
+
 } // end namespace codepi
