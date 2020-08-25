@@ -82,8 +82,7 @@ public:
 
   // assigns value.  Allocates if necessary
   Optional<T>& operator=(const T& rhs){
-    if(!mpVal) mpVal = new T;
-    *mpVal = rhs;
+    get() = rhs;
     return *this;
   }
 
@@ -97,8 +96,7 @@ public:
 
   // assigns value.  Allocates if necessary
   Optional<T>& operator=(T&& rhs){
-    if(!mpVal) mpVal = new T;
-    *mpVal = std::move(rhs);
+    get() = std::move(rhs);
     return *this;
   }
 
@@ -115,14 +113,12 @@ public:
 
   // allows access to instance methods and variables if payload is struct/class
   T* operator->() {
-    T& me = (T&)*this;
-    return &me;
+    return &get();
   }
 
   // allows access to instance methods and variables if payload is struct/class (const version)
   const T* operator->() const {
-    T& me = (T&)*this;
-    return &me;
+    return &get();
   }
 
 private:
