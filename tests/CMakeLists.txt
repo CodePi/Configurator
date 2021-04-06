@@ -9,3 +9,7 @@ add_executable(TestConfig2 TestConfig2.cpp ../Configurator/configurator.cpp)
 add_executable(TestConfig3 TestConfig3.cpp ../Configurator/configurator.cpp)
 add_executable(testOptional testOptional.cpp ../Configurator/configurator.cpp)
 
+add_test("TestConfig" TestConfig)
+add_test("TestConfig2" TestConfig2)
+add_test("TestConfig3" TestConfig3)
+add_test("testOptional" testOptional)
