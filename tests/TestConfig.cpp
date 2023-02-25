@@ -54,9 +54,4 @@ int main(){
   }catch(exception& e){
     cout<<e.what()<<endl;
   }
-
-  #ifndef __GNUC__ 
-  cout << "Press enter to exit.\n";
-  getchar();
-  #endif
 }
